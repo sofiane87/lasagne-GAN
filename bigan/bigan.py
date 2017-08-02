@@ -286,24 +286,9 @@ class BIGAN():
             # If at save interval => save generated image samples
             if epoch % save_interval == 0:
                 # Select a random half batch of images
+                print('----- Saving -----')
                 self.save_imgs(epoch,imgs)
 
-    # def save_imgs(self, epoch):
-    #     r, c = 5, 5
-    #     z = np.random.normal(size=(25, self.latent_dim))
-    #     gen_imgs = self.predict_generator(z)
-
-    #     gen_imgs = 0.5 * gen_imgs + 0.5
-
-    #     fig, axs = plt.subplots(r, c)
-    #     cnt = 0
-    #     for i in range(r):
-    #         for j in range(c):
-    #             axs[i,j].imshow(gen_imgs[cnt, :,:,0], cmap='gray')
-    #             axs[i,j].axis('off')
-    #             cnt += 1
-    #     fig.savefig("bigan/images/mnist_%d.png" % epoch)
-    #     plt.close()
 
     def save_imgs(self, epoch,imgs):
         r, c = 5, 5
@@ -322,6 +307,8 @@ class BIGAN():
                 axs[i,j].imshow(gen_imgs[cnt, :,:,0], cmap='gray')
                 axs[i,j].axis('off')
                 cnt += 1
+        
+        print('----- Saving generated -----')
         fig.savefig("bigan/images/mnist_%d.png" % epoch)
         plt.close()
 
@@ -333,6 +320,7 @@ class BIGAN():
                 axs[i,j].imshow(gen_enc_imgs[cnt, :,:,0], cmap='gray')
                 axs[i,j].axis('off')
                 cnt += 1
+        print('----- Saving encoded -----')
         fig.savefig("bigan/images/mnist_%d_enc.png" % epoch)
         plt.close()
 
@@ -343,12 +331,14 @@ class BIGAN():
                 axs[i,j].imshow(imgs[cnt, :,:,0], cmap='gray')
                 axs[i,j].axis('off')
                 cnt += 1
+        
+        print('----- Saving real -----')
         fig.savefig("bigan/images/mnist_%d_real.png" % epoch)
         plt.close()
 
 if __name__ == '__main__':
     bigan = BIGAN()
-    bigan.train(epochs=1, batch_size=32, save_interval=400)
+    bigan.train(epochs=1001, batch_size=32, save_interval=100)
 
 
 
