@@ -16,6 +16,8 @@ import keras.backend as K
 import matplotlib.pyplot as plt
 
 import numpy as np
+from time import time
+
 
 class BIGAN():
     def __init__(self):
@@ -135,30 +137,32 @@ class BIGAN():
         model_image = LeakyReLU(alpha=0.2)(model_image)
         model_image = Dropout(0.25)(model_image)
         model_image = BatchNormalization(momentum=0.8)(model_image)
-        model_image = Conv2D(128, kernel_size=3, strides=2, padding="same")(model_image)
-        model_image = LeakyReLU(alpha=0.2)(model_image)
-        model_image = Dropout(0.25)(model_image)
-        model_image = BatchNormalization(momentum=0.8)(model_image)
-        model_image = Conv2D(256, kernel_size=3, strides=1, padding="same")(model_image)
+        # model_image = Conv2D(128, kernel_size=3, strides=2, padding="same")(model_image)
+        # model_image = LeakyReLU(alpha=0.2)(model_image)
+        # model_image = Dropout(0.25)(model_image)
+        # model_image = BatchNormalization(momentum=0.8)(model_image)
+        # model_image = Conv2D(256, kernel_size=3, strides=1, padding="same")(model_image)
+        # model_image = LeakyReLU(alpha=0.2)(model_image)
+        # model_image = Dropout(0.25)(model_image)
+        
         z_shape = int(np.prod(model_image.shape[1:]))
-        model_image = LeakyReLU(alpha=0.2)(model_image)
-        model_image = Dropout(0.25)(model_image)
         model_image = Flatten()(model_image)
 
 
         z = Input(shape=(self.latent_dim, ))
         model_z = Dense(z_shape)(z)
-        d_in = concatenate([model_image,model_z,multiply([model_image,model_z])])
-
+        # d_in = concatenate([model_image,model_z,multiply([model_image,model_z])])
+        d_in = concatenate([model_image,model_z])
+        
         model = Dense(1024)(d_in)
         model = LeakyReLU(alpha=0.2)(model)
         model = Dropout(0.5)(model)
-        model = Dense(1024)(model)
-        model = LeakyReLU(alpha=0.2)(model)
-        model = Dropout(0.5)(model)
-        model = Dense(1024)(model)
-        model = LeakyReLU(alpha=0.2)(model)
-        model = Dropout(0.5)(model)
+        # model = Dense(1024)(model)
+        # model = LeakyReLU(alpha=0.2)(model)
+        # model = Dropout(0.5)(model)
+        # model = Dense(1024)(model)
+        # model = LeakyReLU(alpha=0.2)(model)
+        # model = Dropout(0.5)(model)
         validity = Dense(1, activation="sigmoid")(model)
 
 
@@ -176,7 +180,7 @@ class BIGAN():
         half_batch = int(batch_size / 2)
 
         for epoch in range(epochs):
-
+            start_time = time()
 
             # ---------------------
             #  Train Discriminator
@@ -216,8 +220,9 @@ class BIGAN():
             # Train the generator (z -> img is valid and img -> z is is invalid)
             g_loss = self.bigan_generator.train_on_batch([z, imgs], [valid, fake])
 
+            end_time = time()
             # Plot the progress
-            print ("%d [D loss: %f, acc: %.2f%%] [G loss: %f]" % (epoch, d_loss[0], 100*d_loss[1], g_loss[0]))
+            print ("%d [D loss: %f, acc: %.2f%%] [G loss: %f] [time : %.4f]" % (epoch, d_loss[0], 100*d_loss[1], g_loss[0],end_time-start_time))
 
             # If at save interval => save generated image samples
             if epoch % save_interval == 0:
