@@ -153,8 +153,8 @@ class BIGAN():
         model_z = Dense(z_shape)(z)
         # d_in = concatenate([model_image,model_z,multiply([model_image,model_z])])
         d_in = concatenate([model_image,model_z])
-        
-        model = Dense(1024)(d_in)
+
+        model = Dense(200)(d_in)
         model = LeakyReLU(alpha=0.2)(model)
         model = Dropout(0.5)(model)
         # model = Dense(1024)(model)
