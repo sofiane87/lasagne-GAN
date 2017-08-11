@@ -191,7 +191,7 @@ class BIGAN():
             # ---------------------
 
             # Sample noise and generate img
-            z = np.random.normal(size=(half_batch, self.latent_dim))
+            z = np.random.normal(size=(half_batch, self.latent_dim)).astype('float32')
             imgs_ = self.generator.predict(z)
 
             # Select a random half batch of images and encode
@@ -199,8 +199,8 @@ class BIGAN():
             imgs = X_train[idx]
             z_ = self.encoder.predict(imgs)
 
-            valid = np.ones((half_batch, 1))
-            fake = np.zeros((half_batch, 1))
+            valid = np.ones((half_batch, 1)).astype('float32')
+            fake = np.zeros((half_batch, 1)).astype('float32')
 
             # Train the discriminator (img -> z is valid, z -> img is fake)
             d_loss_real = self.discriminator.train_on_batch([z_, imgs], valid)
@@ -212,14 +212,14 @@ class BIGAN():
             # ---------------------
 
             # Sample gaussian noise
-            z = np.random.normal(size=(batch_size, self.latent_dim))
+            z = np.random.normal(size=(batch_size, self.latent_dim)).astype('float32')
 
             # Select a random half batch of images
             idx = np.random.randint(0, X_train.shape[0], batch_size)
             imgs = X_train[idx]
 
-            valid = np.ones((batch_size, 1))
-            fake = np.zeros((batch_size, 1))
+            valid = np.ones((batch_size, 1)).astype('float32')
+            fake = np.zeros((batch_size, 1)).astype('float32')
 
             # Train the generator (z -> img is valid and img -> z is is invalid)
             g_loss = self.bigan_generator.train_on_batch([z, imgs], [valid, fake])
@@ -234,7 +234,7 @@ class BIGAN():
 
     def save_imgs(self, epoch):
         r, c = 5, 5
-        z = np.random.normal(size=(25, self.latent_dim))
+        z = np.random.normal(size=(25, self.latent_dim)).astype('float32')
         gen_imgs = self.generator.predict(z)
 
         gen_imgs = 0.5 * gen_imgs + 0.5
