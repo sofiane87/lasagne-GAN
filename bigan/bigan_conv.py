@@ -65,7 +65,6 @@ class BIGAN():
 
 
     def build_encoder(self):
-        model = Sequential()
 
         # model.add(Flatten(input_shape=self.img_shape))
         # model.add(Dense(512))
@@ -78,64 +77,57 @@ class BIGAN():
 
         # model.summary()
 
-        model = Sequential()
-        model.add(Conv2D(32, kernel_size=3, strides=2, input_shape=self.img_shape, padding="same"))
-        model.add(LeakyReLU(alpha=0.2))
-        model.add(Dropout(0.25))
-        model.add(Conv2D(64, kernel_size=3, strides=2, padding="same"))
-        model.add(ZeroPadding2D(padding=((0,1),(0,1))))
-        model.add(LeakyReLU(alpha=0.2))
-        model.add(Dropout(0.25))
-        model.add(BatchNormalization(momentum=0.8))
-        model.add(Conv2D(128, kernel_size=3, strides=2, padding="same"))
-        model.add(LeakyReLU(alpha=0.2))
-        model.add(Dropout(0.25))
-        model.add(BatchNormalization(momentum=0.8))
-        model.add(Conv2D(256, kernel_size=3, strides=1, padding="same"))
-        model.add(LeakyReLU(alpha=0.2))
-        model.add(Dropout(0.25))
-        model.add(Flatten())
-        model.add(Dense(self.latent_dim))
 
         img = Input(shape=self.img_shape)
-        z = model(img)
+
+        model = Conv2D(32, kernel_size=3, strides=2, input_shape=self.img_shape, padding="same")(img)
+        model = LeakyReLU(alpha=0.2)(model)
+        model = Dropout(0.25)(model)
+        model = Conv2D(64, kernel_size=3, strides=2, padding="same")(model)
+        model = ZeroPadding2D(padding=((0,1),(0,1)))(model)
+        model = LeakyReLU(alpha=0.2)(model)
+        model = Dropout(0.25)(model)
+        model = BatchNormalization(momentum=0.8)(model)
+        model = Conv2D(128, kernel_size=3, strides=2, padding="same")(model)
+        model = LeakyReLU(alpha=0.2)(model)
+        model = Dropout(0.25)(model)
+        model = BatchNormalization(momentum=0.8)(model)
+        model = Conv2D(256, kernel_size=3, strides=1, padding="same")(model)
+        model = LeakyReLU(alpha=0.2)(model)
+        model = Dropout(0.25)(model)
+        model = Flatten()(model)
+        z = Dense(self.latent_dim)(model)
+
+
 
         return Model(img, z)
 
     def build_generator(self):
 
 
-        noise_shape = (self.latent_dim,)
-        
-        model = Sequential()
-
-        model.add(Dense(128 * 7 * 7, activation="relu", input_shape=noise_shape))
-        model.add(Reshape((7, 7, 128)))
-        model.add(BatchNormalization(momentum=0.8))
-        model.add(UpSampling2D())
-        model.add(Conv2D(128, kernel_size=3, padding="same"))
-        model.add(Activation("relu"))
-        model.add(BatchNormalization(momentum=0.8)) 
-        model.add(UpSampling2D())
-        model.add(Conv2D(64, kernel_size=3, padding="same"))
-        model.add(Activation("relu"))
-        model.add(BatchNormalization(momentum=0.8))
-        model.add(Conv2D(1, kernel_size=3, padding="same"))
-        model.add(Activation("tanh"))
-
-
-        model.summary()
-
         z = Input(shape=(self.latent_dim,))
-        gen_img = model(z)
 
-        return Model(z, gen_img)
+        model = Dense(128 * 7 * 7, activation="relu")(z)
+        model = Reshape((7, 7, 128))(model)
+        model = BatchNormalization(momentum=0.8)(model)
+        model = UpSampling2D()(model)
+        model = Conv2D(128, kernel_size=3, padding="same")(model)
+        model = Activation("relu")(model)
+        model = BatchNormalization(momentum=0.8)(model)
+        model = UpSampling2D()(model)
+        model = Conv2D(64, kernel_size=3, padding="same")(model)
+        model = Activation("relu")(model)
+        model = BatchNormalization(momentum=0.8)(model)
+        model = Conv2D(1, kernel_size=3, padding="same")(model)
+        model = Activation("tanh")(model)
+
+        return Model(z, model)
 
     def build_discriminator(self):
 
 
         img = Input(shape=self.img_shape)
-        model_image = Conv2D(32, kernel_size=3, strides=2, input_shape=self.img_shape, padding="same")(img)
+        model_image = Conv2D(32, kernel_size=3, strides=2, padding="same")(img)
         model_image = LeakyReLU(alpha=0.2)(model_image)
         model_image = Dropout(0.25)(model_image)
         model_image = Conv2D(64, kernel_size=3, strides=2, padding="same")(model_image)
@@ -155,7 +147,6 @@ class BIGAN():
 
 
         z = Input(shape=(self.latent_dim, ))
-        print(z_shape)
         model_z = Dense(z_shape)(z)
         d_in = concatenate([model_image,model_z,multiply([model_image,model_z])])
 
@@ -169,6 +160,7 @@ class BIGAN():
         model = LeakyReLU(alpha=0.2)(model)
         model = Dropout(0.5)(model)
         validity = Dense(1, activation="sigmoid")(model)
+
 
         return Model([z, img], validity)
 
