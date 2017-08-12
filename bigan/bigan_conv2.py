@@ -318,15 +318,15 @@ class BIGAN():
 
 
     def model_save(self):
-        self.encoder.save('saved_model/encoder.h5')
-        self.generator.save('saved_model/generator.h5')
-        self.discriminator.save('saved_model/discriminator.h5')
+        self.encoder.save('bigan/saved_model/encoder.h5')
+        self.generator.save('bigan/saved_model/generator.h5')
+        self.discriminator.save('bigan/saved_model/discriminator.h5')
 
 
     def model_load(self):
-        self.encoder = load_model('saved_model/encoder.h5')
-        self.generator = load_model('saved_model/generator.h5') 
-        self.discriminator = load_model('saved_model/discriminator.h5') 
+        self.encoder = load_model('bigan/saved_model/encoder.h5')
+        self.generator = load_model('bigan/saved_model/generator.h5') 
+        self.discriminator = load_model('bigan/saved_model/discriminator.h5') 
 
 
     def train(self, epochs, batch_size=128, save_interval=50):
