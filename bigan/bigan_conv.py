@@ -18,6 +18,12 @@ import matplotlib.pyplot as plt
 import numpy as np
 from time import time
 
+backend_name = K.backend()
+
+is_tf = False
+if 'tensorflow' in backend_name.lower():
+    is_tf = True
+
 
 class BIGAN():
     def __init__(self):
@@ -145,8 +151,15 @@ class BIGAN():
         # model_image = LeakyReLU(alpha=0.2)(model_image)
         # model_image = Dropout(0.25)(model_image)
         
-        z_shape = int(np.prod(model_image.shape[1:]))
-        model_image = Flatten()(model_image)
+        if is_tf:
+            z_shape = int(np.prod(model_image.shape[1:]))
+            model_image = Flatten()(model_image)
+        else:
+            print('input shape : ',model_image.shape)
+            z_shape = np.prod(model_image.shape[1:])
+            print(z_shape)
+            z_shape = int(z_shape)
+
 
 
         z = Input(shape=(self.latent_dim, ))
