@@ -155,8 +155,9 @@ class BIGAN():
             z_shape = int(np.prod(model_image.shape[1:]))
             model_image = Flatten()(model_image)
         else:
-            print('input shape : ',model_image.shape)
-            z_shape = np.prod(model_image.shape[1:])
+            print('input shape : ',K.tensor.shape(model_image))
+            print('input shape : ',K.tensor.shape(model_image).to_list())
+            z_shape = np.prod(K.tensor.shape(model_image).to_list()[1:])
             print(z_shape)
             z_shape = int(z_shape)
 
