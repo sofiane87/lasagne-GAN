@@ -27,7 +27,6 @@ if 'tensorflow' in backend_name.lower():
 
 
 class BIGAN():
-    def __init__(self):
     def __init__(self,reload_model = False):
         self.img_rows = 28 
         self.img_cols = 28
