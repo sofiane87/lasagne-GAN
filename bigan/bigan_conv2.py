@@ -167,6 +167,101 @@ class BIGAN():
         return Model(z, model)
 
 
+    def build_discriminator(self):
+
+
+        # img = Input(shape=self.img_shape)
+        # model_image = Conv2D(32, kernel_size=3, strides=2, padding="same")(img)
+        # model_image = LeakyReLU(alpha=0.2)(model_image)
+        # model_image = Dropout(0.25)(model_image)
+        # model_image = Conv2D(64, kernel_size=3, strides=2, padding="same")(model_image)
+        # model_image = ZeroPadding2D(padding=((0,1),(0,1)))(model_image)
+        # model_image = LeakyReLU(alpha=0.2)(model_image)
+        # model_image = Dropout(0.25)(model_image)
+        # model_image = BatchNormalization(momentum=0.8)(model_image)
+        # # model_image = Conv2D(128, kernel_size=3, strides=2, padding="same")(model_image)
+        # # model_image = LeakyReLU(alpha=0.2)(model_image)
+        # # model_image = Dropout(0.25)(model_image)
+        # # model_image = BatchNormalization(momentum=0.8)(model_image)
+        # # model_image = Conv2D(256, kernel_size=3, strides=1, padding="same")(model_image)
+        # # model_image = LeakyReLU(alpha=0.2)(model_image)
+        # # model_image = Dropout(0.25)(model_image)
+        
+        # # z_shape = int(np.prod(model_image.shape[1:]))
+        # model_image = Flatten()(model_image)
+
+
+
+        img = Input(shape=self.img_shape)
+
+        model_image = ZeroPadding2D(3)(img)
+        model_image = Conv2D(68, kernel_size=4, strides=2, padding="valid")(model_image)
+        model_image = LeakyReLU(alpha=0.2)(model_image)
+        model_image = BatchNormalization(momentum=0.8)(model_image)
+
+        model_image = ZeroPadding2D(2)(model_image)
+        model_image = Conv2D(128, kernel_size=5, strides=2, padding="valid")(model_image)
+        model_image = LeakyReLU(alpha=0.2)(model_image)
+        model_image = BatchNormalization(momentum=0.8)(model_image)
+
+        model_image = ZeroPadding2D(2)(model_image)
+        model_image = Conv2D(256, kernel_size=5, strides=2, padding="valid")(model_image)
+        model_image = LeakyReLU(alpha=0.2)(model_image)
+        model_image = BatchNormalization(momentum=0.8)(model_image)
+
+        model_image = ZeroPadding2D(2)(model_image)
+        model_image = Conv2D(512, kernel_size=5, strides=2, padding="valid")(model_image)
+        model_image = LeakyReLU(alpha=0.2)(model_image)
+        model_image = BatchNormalization(momentum=0.8)(model_image)
+
+
+        model_image = BatchNormalization(momentum=0.8)(model_image)
+
+        model_image = ZeroPadding2D(2)(model_image)
+        model_image = Conv2D(1024, kernel_size=5, strides=2, padding="valid")(model_image)
+        model_image = LeakyReLU(alpha=0.2)(model_image)
+        model_image = BatchNormalization(momentum=0.8)(model_image)
+        model_image = Flatten()(model_image)
+        model_image = BatchNormalization(momentum=0.8)(model_image)
+        model_image = Dense(self.latent_dim)(model_image)
+        model_image = BatchNormalization(momentum=0.8)(model_image)
+
+
+        # model_image = Conv2D(64, kernel_size=3, strides=2, padding="valid")(model_image)
+        # model_image = ZeroPadding2D(padding=((0,1),(0,1)))(model_image)
+        # model_image = LeakyReLU(alpha=0.2)(model_image)
+        # model_image = Dropout(0.25)(model_image)
+        # model_image = BatchNormalization(momentum=0.8)(model_image)
+        # model_image = Conv2D(128, kernel_size=3, strides=2, padding="same")(model_image)
+        # model_image = LeakyReLU(alpha=0.2)(model_image)
+        # model_image = Dropout(0.25)(model_image)
+        # model_image = BatchNormalization(momentum=0.8)(model_image)
+        # model_image = Conv2D(256, kernel_size=3, strides=1, padding="same")(model_image)
+        # model_image = LeakyReLU(alpha=0.2)(model_image)
+        # model_image = Dropout(0.25)(model_image)
+        
+
+
+        z = Input(shape=(self.latent_dim, ))
+
+        # d_in = concatenate([model_image,model_z,multiply([model_image,model_z])])
+        d_in = concatenate([model_image,z])
+
+        model = Dense(1024)(d_in)
+        model = LeakyReLU(alpha=0.2)(model)
+        model = Dropout(0.5)(model)
+        # model = Dense(1024)(model)
+        # model = LeakyReLU(alpha=0.2)(model)
+        # model = Dropout(0.5)(model)
+        # model = Dense(1024)(model)
+        # model = LeakyReLU(alpha=0.2)(model)
+        # model = Dropout(0.5)(model)
+        validity = Dense(1, activation="sigmoid")(model)
+
+
+        return Model([z, img], validity)
+
+
     # def build_discriminator(self):
 
 
@@ -191,119 +286,24 @@ class BIGAN():
     #     model_image = Flatten()(model_image)
 
 
-
-    #     img = Input(shape=self.img_shape)
-
-    #     model_image = ZeroPadding2D(3)(img)
-    #     model_image = Conv2D(68, kernel_size=4, strides=2, padding="valid")(model_image)
-    #     model_image = LeakyReLU(alpha=0.2)(model_image)
-    #     model_image = BatchNormalization(momentum=0.8)(model_image)
-
-    #     model_image = ZeroPadding2D(2)(model_image)
-    #     model_image = Conv2D(128, kernel_size=5, strides=2, padding="valid")(model_image)
-    #     model_image = LeakyReLU(alpha=0.2)(model_image)
-    #     model_image = BatchNormalization(momentum=0.8)(model_image)
-
-    #     model_image = ZeroPadding2D(2)(model_image)
-    #     model_image = Conv2D(256, kernel_size=5, strides=2, padding="valid")(model_image)
-    #     model_image = LeakyReLU(alpha=0.2)(model_image)
-    #     model_image = BatchNormalization(momentum=0.8)(model_image)
-
-    #     model_image = ZeroPadding2D(2)(model_image)
-    #     model_image = Conv2D(512, kernel_size=5, strides=2, padding="valid")(model_image)
-    #     model_image = LeakyReLU(alpha=0.2)(model_image)
-    #     model_image = BatchNormalization(momentum=0.8)(model_image)
-
-
-    #     model_image = BatchNormalization(momentum=0.8)(model_image)
-
-    #     model_image = ZeroPadding2D(2)(model_image)
-    #     model_image = Conv2D(1024, kernel_size=5, strides=2, padding="valid")(model_image)
-    #     model_image = LeakyReLU(alpha=0.2)(model_image)
-    #     model_image = BatchNormalization(momentum=0.8)(model_image)
-    #     model_image = Flatten()(model_image)
-    #     model_image = BatchNormalization(momentum=0.8)(model_image)
-    #     model_image = Dense(self.latent_dim)(model_image)
-    #     model_image = BatchNormalization(momentum=0.8)(model_image)
-
-
-    #     # model_image = Conv2D(64, kernel_size=3, strides=2, padding="valid")(model_image)
-    #     # model_image = ZeroPadding2D(padding=((0,1),(0,1)))(model_image)
-    #     # model_image = LeakyReLU(alpha=0.2)(model_image)
-    #     # model_image = Dropout(0.25)(model_image)
-    #     # model_image = BatchNormalization(momentum=0.8)(model_image)
-    #     # model_image = Conv2D(128, kernel_size=3, strides=2, padding="same")(model_image)
-    #     # model_image = LeakyReLU(alpha=0.2)(model_image)
-    #     # model_image = Dropout(0.25)(model_image)
-    #     # model_image = BatchNormalization(momentum=0.8)(model_image)
-    #     # model_image = Conv2D(256, kernel_size=3, strides=1, padding="same")(model_image)
-    #     # model_image = LeakyReLU(alpha=0.2)(model_image)
-    #     # model_image = Dropout(0.25)(model_image)
-        
-
-
     #     z = Input(shape=(self.latent_dim, ))
-
+    #     model_z = Dense(z_shape)(z)
     #     # d_in = concatenate([model_image,model_z,multiply([model_image,model_z])])
-    #     d_in = concatenate([model_image,z])
+    #     d_in = concatenate([model_image,model_z])
 
-        # model = Dense(1024)(d_in)
-        # model = LeakyReLU(alpha=0.2)(model)
-        # model = Dropout(0.5)(model)
-        # # model = Dense(1024)(model)
-        # # model = LeakyReLU(alpha=0.2)(model)
-        # # model = Dropout(0.5)(model)
-        # # model = Dense(1024)(model)
-        # # model = LeakyReLU(alpha=0.2)(model)
-        # # model = Dropout(0.5)(model)
-        # validity = Dense(1, activation="sigmoid")(model)
-
-
-        # return Model([z, img], validity)
+    #     model = Dense(200)(d_in)
+    #     model = LeakyReLU(alpha=0.2)(model)
+    #     model = Dropout(0.5)(model)
+    #     # model = Dense(1024)(model)
+    #     # model = LeakyReLU(alpha=0.2)(model)
+    #     # model = Dropout(0.5)(model)
+    #     # model = Dense(1024)(model)
+    #     # model = LeakyReLU(alpha=0.2)(model)
+    #     # model = Dropout(0.5)(model)
+    #     validity = Dense(1, activation="sigmoid")(model)
 
 
-    def build_discriminator(self):
-
-
-        img = Input(shape=self.img_shape)
-        model_image = Conv2D(32, kernel_size=3, strides=2, padding="same")(img)
-        model_image = LeakyReLU(alpha=0.2)(model_image)
-        model_image = Dropout(0.25)(model_image)
-        model_image = Conv2D(64, kernel_size=3, strides=2, padding="same")(model_image)
-        model_image = ZeroPadding2D(padding=((0,1),(0,1)))(model_image)
-        model_image = LeakyReLU(alpha=0.2)(model_image)
-        model_image = Dropout(0.25)(model_image)
-        model_image = BatchNormalization(momentum=0.8)(model_image)
-        # model_image = Conv2D(128, kernel_size=3, strides=2, padding="same")(model_image)
-        # model_image = LeakyReLU(alpha=0.2)(model_image)
-        # model_image = Dropout(0.25)(model_image)
-        # model_image = BatchNormalization(momentum=0.8)(model_image)
-        # model_image = Conv2D(256, kernel_size=3, strides=1, padding="same")(model_image)
-        # model_image = LeakyReLU(alpha=0.2)(model_image)
-        # model_image = Dropout(0.25)(model_image)
-        
-        z_shape = int(np.prod(model_image.shape[1:]))
-        model_image = Flatten()(model_image)
-
-
-        z = Input(shape=(self.latent_dim, ))
-        model_z = Dense(z_shape)(z)
-        # d_in = concatenate([model_image,model_z,multiply([model_image,model_z])])
-        d_in = concatenate([model_image,model_z])
-
-        model = Dense(200)(d_in)
-        model = LeakyReLU(alpha=0.2)(model)
-        model = Dropout(0.5)(model)
-        # model = Dense(1024)(model)
-        # model = LeakyReLU(alpha=0.2)(model)
-        # model = Dropout(0.5)(model)
-        # model = Dense(1024)(model)
-        # model = LeakyReLU(alpha=0.2)(model)
-        # model = Dropout(0.5)(model)
-        validity = Dense(1, activation="sigmoid")(model)
-
-
-        return Model([z, img], validity)
+    #     return Model([z, img], validity)
 
     def train(self, epochs, batch_size=128, save_interval=50):
 
