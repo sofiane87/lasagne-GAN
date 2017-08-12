@@ -28,29 +28,38 @@ if 'tensorflow' in backend_name.lower():
 
 class BIGAN():
     def __init__(self):
+    def __init__(self,reload_model = False):
         self.img_rows = 28 
         self.img_cols = 28
         self.channels = 1
         self.img_shape = (self.img_rows, self.img_cols, self.channels)
         self.latent_dim = 100
-
+        self.reload = reload_model
         optimizer = Adam(0.0002, 0.5)
 
-        # Build and compile the discriminator
-        self.discriminator = self.build_discriminator()
-        self.discriminator.compile(loss=['binary_crossentropy'], 
-            optimizer=optimizer,
-            metrics=['accuracy'])
+
 
         # Build and compile the generator
-        self.generator = self.build_generator()
+        if self.reload :
+            self.model_load()
+        else:
+            # Build and compile the discriminator
+            self.discriminator = self.build_discriminator()            
+
+            self.generator = self.build_generator()
+
+            # Build and compile the encoder
+            self.encoder = self.build_encoder()
+
+        self.discriminator.compile(loss=['binary_crossentropy'], 
+        optimizer=optimizer,
+        metrics=['accuracy'])
+
         self.generator.compile(loss=['binary_crossentropy'], 
             optimizer=optimizer)
-
-        # Build and compile the encoder
-        self.encoder = self.build_encoder()
         self.encoder.compile(loss=['binary_crossentropy'], 
-            optimizer=optimizer)
+        optimizer=optimizer)
+
 
         # The part of the bigan that trains the discriminator and encoder
         self.discriminator.trainable = False
@@ -176,6 +185,20 @@ class BIGAN():
 
         return Model([z, img], validity)
 
+
+    def model_save(self):
+        self.encoder.save('saved_model/encoder.h5')
+        self.generator.save('saved_model/generator.h5')
+        self.discriminator.save('saved_model/discriminator.h5')
+
+
+    def model_load(self):
+        self.encoder = load_model('saved_model/encoder.h5')
+        self.generator = load_model('saved_model/generator.h5') 
+        self.discriminator = load_model('saved_model/discriminator.h5') 
+
+
+
     def train(self, epochs, batch_size=128, save_interval=50):
 
         # Load the dataset
@@ -236,6 +259,7 @@ class BIGAN():
             if epoch % save_interval == 0:
                 # Select a random half batch of images
                 self.save_imgs(epoch,imgs)
+                self.model_save()
 
     def save_imgs(self, epoch,imgs):
         r, c = 5, 5
@@ -286,8 +310,10 @@ class BIGAN():
 
 
 if __name__ == '__main__':
-    bigan = BIGAN()
-    bigan.train(epochs=20001, batch_size=32, save_interval=100)
+    reload_bool = False
+    bigan = BIGAN(reload_model = reload_bool)
+    if not(reload_bool):    
+        bigan.train(epochs=20001, batch_size=32, save_interval=100)
 
 
 
