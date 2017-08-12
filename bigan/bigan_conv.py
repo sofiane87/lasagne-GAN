@@ -18,6 +18,7 @@ from matplotlib import pyplot as plt
 
 import numpy as np
 from time import time
+import sys
 
 backend_name = K.backend()
 
@@ -126,9 +127,11 @@ class BIGAN(BIGAN_ROOT):
 
 
 if __name__ == '__main__':
-    reload_bool = True
+    reload_bool = False
+    if '-test' in sys.argv[1:]:
+        reload_bool = True
     bigan = BIGAN(reload_model = reload_bool)
-    bigan.run(epochs=30001, batch_size=32, save_interval=100)
+    bigan.run(epochs=50001, batch_size=128, save_interval=100)
 
 
 
