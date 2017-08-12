@@ -313,7 +313,7 @@ if __name__ == '__main__':
     reload_bool = False
     bigan = BIGAN(reload_model = reload_bool)
     if not(reload_bool):    
-        bigan.train(epochs=20001, batch_size=32, save_interval=100)
+        bigan.train(epochs=30001, batch_size=32, save_interval=100)
 
 
 
