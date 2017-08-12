@@ -137,10 +137,10 @@ class BIGAN():
         model_image = LeakyReLU(alpha=0.2)(model_image)
         model_image = Dropout(0.25)(model_image)
         model_image = BatchNormalization(momentum=0.8)(model_image)
-        # model_image = Conv2D(128, kernel_size=3, strides=2, padding="same")(model_image)
-        # model_image = LeakyReLU(alpha=0.2)(model_image)
-        # model_image = Dropout(0.25)(model_image)
-        # model_image = BatchNormalization(momentum=0.8)(model_image)
+        model_image = Conv2D(128, kernel_size=3, strides=2, padding="same")(model_image)
+        model_image = LeakyReLU(alpha=0.2)(model_image)
+        model_image = Dropout(0.25)(model_image)
+        model_image = BatchNormalization(momentum=0.8)(model_image)
         # model_image = Conv2D(256, kernel_size=3, strides=1, padding="same")(model_image)
         # model_image = LeakyReLU(alpha=0.2)(model_image)
         # model_image = Dropout(0.25)(model_image)
@@ -154,7 +154,7 @@ class BIGAN():
         # d_in = concatenate([model_image,model_z,multiply([model_image,model_z])])
         d_in = concatenate([model_image,model_z])
 
-        model = Dense(200)(d_in)
+        model = Dense(100)(d_in)
         model = LeakyReLU(alpha=0.2)(model)
         model = Dropout(0.5)(model)
         # model = Dense(1024)(model)
@@ -227,14 +227,17 @@ class BIGAN():
             # If at save interval => save generated image samples
             if epoch % save_interval == 0:
                 # Select a random half batch of images
-                self.save_imgs(epoch)
+                self.save_imgs(epoch,imgs)
 
-    def save_imgs(self, epoch):
+    def save_imgs(self, epoch,imgs):
         r, c = 5, 5
-        z = np.random.normal(size=(25, self.latent_dim)).astype('float32')
+        z = np.random.normal(size=(25, self.latent_dim))
         gen_imgs = self.generator.predict(z)
-
         gen_imgs = 0.5 * gen_imgs + 0.5
+
+        z_imgs = self.encoder.predict(imgs)
+        gen_enc_imgs = self.generator.predict(z_imgs)
+        gen_enc_imgs = 0.5 * gen_enc_imgs + 0.5
 
         fig, axs = plt.subplots(r, c)
         cnt = 0
@@ -243,13 +246,40 @@ class BIGAN():
                 axs[i,j].imshow(gen_imgs[cnt, :,:,0], cmap='gray')
                 axs[i,j].axis('off')
                 cnt += 1
+        
+        print('----- Saving generated -----')
         fig.savefig("bigan/images/mnist_%d.png" % epoch)
         plt.close()
 
 
+        fig, axs = plt.subplots(r, c)
+        cnt = 0
+        for i in range(r):
+            for j in range(c):
+                axs[i,j].imshow(gen_enc_imgs[cnt, :,:,0], cmap='gray')
+                axs[i,j].axis('off')
+                cnt += 1
+        print('----- Saving encoded -----')
+        fig.savefig("bigan/images/mnist_%d_enc.png" % epoch)
+        plt.close()
+
+        fig, axs = plt.subplots(r, c)
+        cnt = 0
+        for i in range(r):
+            for j in range(c):
+                axs[i,j].imshow(imgs[cnt, :,:,0], cmap='gray')
+                axs[i,j].axis('off')
+                cnt += 1
+        
+        print('----- Saving real -----')
+        fig.savefig("bigan/images/mnist_%d_real.png" % epoch)
+        plt.close()
+
+
+
 if __name__ == '__main__':
     bigan = BIGAN()
-    bigan.train(epochs=40000, batch_size=32, save_interval=400)
+    bigan.train(epochs=20001, batch_size=32, save_interval=100)
 
 
 
