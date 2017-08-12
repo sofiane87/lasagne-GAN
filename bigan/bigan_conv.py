@@ -151,20 +151,13 @@ class BIGAN():
         # model_image = LeakyReLU(alpha=0.2)(model_image)
         # model_image = Dropout(0.25)(model_image)
         
-        if is_tf:
-            z_shape = int(np.prod(model_image.shape[1:]))
-            model_image = Flatten()(model_image)
-        else:
-            print('input shape : ',K.tensor.shape(model_image))
-            print('input shape : ',K.tensor.shape(model_image).to_list())
-            z_shape = np.prod(K.tensor.shape(model_image).to_list()[1:])
-            print(z_shape)
-            z_shape = int(z_shape)
+        model_image = Flatten()(model_image)
+        model_image = Dense(self.latent_dim)(model_image)
 
 
 
         z = Input(shape=(self.latent_dim, ))
-        model_z = Dense(z_shape)(z)
+        model_z = Dense(self.latent_dim)(z)
         # d_in = concatenate([model_image,model_z,multiply([model_image,model_z])])
         d_in = concatenate([model_image,model_z])
 
