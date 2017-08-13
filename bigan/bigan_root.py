@@ -12,8 +12,16 @@ from keras.optimizers import Adam
 from keras import losses
 from keras.utils import to_categorical
 import keras.backend as K
+import platform
 import matplotlib
-matplotlib.use('Agg')
+# matplotlib.use('TkAgg')
+
+if 'angel' in platform.node().lower():
+    print('backend changed')
+    matplotlib.use('Agg')
+
+print(matplotlib.get_backend())
+
 from matplotlib import pyplot as plt
 from keras.models import load_model
 
@@ -30,7 +38,7 @@ if 'tensorflow' in backend_name.lower():
 
 
 class BIGAN_ROOT(object):
-    def __init__(self,img_rows=28,img_cols=28,channels=1, optimizer = Adam, learningRate=0.0002,optimizer_params = {'beta_1' : 0.5}, reload_model = False,save_folder='bigan/'):
+    def __init__(self,img_rows=28,img_cols=28,channels=1, optimizer = Adam, learningRate=0.0002,optimizer_params = {'beta_1' : 0.5}, reload_model = False,save_folder='bigan/',interpolate_bool=False,interpolate_params = {'n_intp':10,'idx':None,'save_idx' : True,'reload_idx':True,'n_steps' : 10}):
         self.img_rows =  img_rows 
         self.img_cols =  img_cols
         self.channels = channels
@@ -42,6 +50,12 @@ class BIGAN_ROOT(object):
         self.optimizer = optimizer(**self.optimizer_params)
         self.save_model_folder = save_folder + 'saved_model/'
         self.save_img_folder = save_folder + 'images/'
+        self.save_idx_folder = save_folder + 'idx/'
+        self.save_intp_folder = save_folder + 'intp/'
+        self.interpolate_bool = interpolate_bool
+        self.interpolate_params = interpolate_params
+        if self.channels == 1:
+            self.cmap = 'gray'
 
 
         # Build and compile the generator
@@ -127,6 +141,93 @@ class BIGAN_ROOT(object):
 
         return X_train
 
+    def run_interpolation(self,n_intp=10,idx=None,save_idx = True,reload_idx=True,n_steps = 10):
+        
+        data = self.load_data()
+
+        if reload_idx : 
+            idx = self.reload_idx()
+
+        if idx == None:
+            idx = []
+
+        index = 0
+        while len(idx)<2*n_intp and index < data.shape[0]:
+            if index not in idx:
+                sample = data[index:index+1]
+                decoded_sample = self.encode_decode(sample)
+                self.display_pair(sample,decoded_sample)
+                decision = raw_input("should we keep this image ?\n").lower()
+                if 'y' in decision:
+                    idx.append(index)
+                    print('index {} added to the list'.format(index))
+                    print('remaining : {}'.format(n_intp*2 - len(idx)))
+                plt.close()
+
+            index += 1
+
+        if save_idx:
+            self.save_idx(idx)
+
+        for i in range(max(n_intp,np.floor(len(idx)/2))):
+            self.interpolate(initial = data[2*i:2*i+1],final = data[2*i+1:2*i+2],index = i,n_steps = n_steps)
+
+
+    def interpolate(self,initial,final,index,n_steps=10):
+        
+        if not(os.path.exists(self.save_intp_folder)):
+            os.makedirs(self.save_intp_folder)
+
+        initial_encoded = self.encoder.predict(initial)
+        final_encoded = self.encoder.predict(final)
+        alphas = np.arange(0,1,1/float(n_steps)).tolist()
+        alphas.append(1)
+
+        fig, axs = plt.subplots(1, n_steps+1)
+        for i in range(n_steps+1):
+            alpha = alphas[i]
+            interpolated_encoding = (1-alpha)*initial_encoded + alpha * final_encoded
+            interpolated_image = 0.5 * self.generator.predict(interpolated_encoding) + 0.5
+            axs[i].imshow(interpolated_image.squeeze(), cmap=self.cmap)
+            axs[i].axis('off')
+
+        fig.savefig(self.save_intp_folder + "mnist_{}_intp.png".format(index))
+        plt.close()
+
+
+    def reload_idx(self):
+        if os.path.exists(self.save_idx_folder + 'idx.npy'):
+            idx = np.load(self.save_idx_folder + 'idx.npy').tolist()
+        else:
+            idx = []
+        return idx
+
+    def save_idx(self,idx):
+        if not(os.path.exists(self.save_idx_folder)):
+            os.makedirs(self.save_idx_folder)
+
+        np.save(self.save_idx_folder + 'idx',idx)
+
+
+    def encode_decode(self,img):
+        encoded_img = self.encoder.predict(img)
+        return self.generator.predict(encoded_img)
+
+    def display_pair(self,img,decoded_img):
+        img = 0.5 + 0.5*(img)
+        decoded_img = 0.5 + 0.5*(decoded_img)
+        fig, axs = plt.subplots(1, 2)
+        self.plot(axs[0],img.squeeze())
+        self.plot(axs[1],decoded_img.squeeze())
+
+        # axs[0].imshow(img.squeeze(), cmap=self.cmap)
+        # axs[0].axis('off')
+        # axs[1].imshow(decoded_img.squeeze(), cmap=self.cmap)
+        # axs[1].axis('off')
+
+        windowmanager = plt.get_current_fig_manager()
+        windowmanager.window.wm_geometry("+0+0")
+        fig.show()
 
     def train(self, epochs, batch_size=128, save_interval=50):
 
@@ -200,6 +301,10 @@ class BIGAN_ROOT(object):
         else:
             self.test(batch_size=batch_size)
 
+        if self.interpolate_bool:
+            print('interpolating ...')
+            self.run_interpolation(**self.interpolate_params)
+            print('interpolation done !')
 
     def save_imgs(self, epoch,imgs):
         if not(os.path.exists(self.save_img_folder)):
@@ -218,8 +323,7 @@ class BIGAN_ROOT(object):
         cnt = 0
         for i in range(r):
             for j in range(c):
-                axs[i,j].imshow(gen_imgs[cnt, :,:,0], cmap='gray')
-                axs[i,j].axis('off')
+                self.plot(axs[i,j],gen_imgs[cnt, :,:,:].squeeze())
                 cnt += 1
         
         print('----- Saving generated -----')
@@ -234,8 +338,7 @@ class BIGAN_ROOT(object):
         cnt = 0
         for i in range(r):
             for j in range(c):
-                axs[i,j].imshow(gen_enc_imgs[cnt, :,:,0], cmap='gray')
-                axs[i,j].axis('off')
+                self.plot(axs[i,j],gen_enc_imgs[cnt, :,:,:].squeeze())
                 cnt += 1
         print('----- Saving encoded -----')
         if isinstance(epoch, str):
@@ -246,10 +349,10 @@ class BIGAN_ROOT(object):
 
         fig, axs = plt.subplots(r, c)
         cnt = 0
+        imgs = imgs * 0.5 + 0.5
         for i in range(r):
             for j in range(c):
-                axs[i,j].imshow(imgs[cnt, :,:,0], cmap='gray')
-                axs[i,j].axis('off')
+                self.plot(axs[i,j],imgs[cnt, :,:,:].squeeze())
                 cnt += 1
         
         print('----- Saving real -----')
@@ -260,10 +363,23 @@ class BIGAN_ROOT(object):
         plt.close()
 
 
+    def plot(self, fig, img):
+        if self.channels == 1:
+            fig.imshow(img,cmap=self.cmap)
+            fig.axis('off')
+        else:
+            fig.imshow(img*255)
+            fig.axis('off')
+
+
+
+
+
 
 if __name__ == '__main__':
     reload_bool = True
-    bigan = BIGAN_ROOT(reload_model = reload_bool)    
+    interpolate_bool = False
+    bigan = BIGAN_ROOT(reload_model = reload_bool,interpolate=interpolate_bool)    
     bigan.run(epochs=30001, batch_size=32, save_interval=100)
 
 

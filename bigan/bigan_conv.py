@@ -12,9 +12,6 @@ from keras.optimizers import Adam
 from keras import losses
 from keras.utils import to_categorical
 import keras.backend as K
-import matplotlib
-matplotlib.use('Agg')
-from matplotlib import pyplot as plt
 
 import numpy as np
 from time import time
@@ -29,8 +26,8 @@ if 'tensorflow' in backend_name.lower():
 from bigan_root import BIGAN_ROOT
 
 class BIGAN(BIGAN_ROOT):
-    def __init__(self,reload_model = False):
-        super(BIGAN, self).__init__(reload_model=reload_model)
+    def __init__(self,reload_model = False,interpolate_bool=False):
+        super(BIGAN, self).__init__(reload_model=reload_model,interpolate_bool=interpolate_bool)
 
     def build_encoder(self):
 
@@ -128,9 +125,12 @@ class BIGAN(BIGAN_ROOT):
 
 if __name__ == '__main__':
     reload_bool = False
+    interpolate_bool = False
     if '-test' in sys.argv[1:]:
         reload_bool = True
-    bigan = BIGAN(reload_model = reload_bool)
+    if '-interpolate' in sys.argv[1:]:
+        interpolate_bool = True
+    bigan = BIGAN(reload_model = reload_bool,interpolate_bool = interpolate_bool)
     bigan.run(epochs=50001, batch_size=128, save_interval=100)
 
 
