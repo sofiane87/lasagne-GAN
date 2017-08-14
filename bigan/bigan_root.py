@@ -16,7 +16,7 @@ import platform
 import matplotlib
 # matplotlib.use('TkAgg')
 
-if 'angel' in platform.node().lower():
+if 'dd144dfd71f8' in platform.node().lower():
     print('backend changed')
     matplotlib.use('Agg')
 

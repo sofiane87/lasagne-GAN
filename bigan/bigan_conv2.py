@@ -14,10 +14,6 @@ from keras.utils import to_categorical
 import keras.backend as K
 from keras.models import load_model
 
-import matplotlib
-matplotlib.use('Agg')
-from matplotlib import pyplot as plt
-
 
 import numpy as np
 from time import time

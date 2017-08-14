@@ -28,19 +28,19 @@ if 'tensorflow' in backend_name.lower():
 import platform
 
 if 'dd144dfd71f8' in platform.node().lower():
-    celeba_path = '/data/users/amp115/skin_analytics/inData/celeba.npy'
+    mole_path = '/data/users/amp115/skin_analytics/inData/mole.npy'
 elif 'alison' in  platform.node().lower()
-    celeba_path = '/Users/pouplinalison/Documents/skin_analytics/code_dcgan/inData/celeba.npy'
+    mole_path = '/Users/pouplinalison/Documents/skin_analytics/code_dcgan/inData/mole.npy'
 else:
-    celeba_path = 'bigan/data/celeba.npy'
+    mole_path = 'bigan/data/mole.npy'
 
 from bigan_root import BIGAN_ROOT
 
 
 class BIGAN(BIGAN_ROOT):
-    def __init__(self,reload_model = False,interpolate_bool=False,celeba_path=celeba_path):
-        super(BIGAN, self).__init__(reload_model=reload_model,interpolate_bool=interpolate_bool,img_rows=64,img_cols=64,channels=3, save_folder='bigan/celeba/')
-        self.dataPath = celeba_path
+    def __init__(self,reload_model = False,interpolate_bool=False,mole_path=mole_path):
+        super(BIGAN, self).__init__(reload_model=reload_model,interpolate_bool=interpolate_bool,img_rows=256,img_cols=256,channels=3, save_folder='bigan/mole/')
+        self.dataPath = mole_path
     def build_encoder(self):
 
         img = Input(shape=self.img_shape)
@@ -72,8 +72,16 @@ class BIGAN(BIGAN_ROOT):
 
         z = Input(shape=(self.latent_dim,))
 
-        model = Dense(128 * 8 * 8, activation="relu")(z)
-        model = Reshape((8, 8, 128))(model)
+        model = Dense(512 * 8 * 8, activation="relu")(z)
+        model = Reshape((8, 8, 512))(model)
+        model = BatchNormalization(momentum=0.8)(model)
+        model = UpSampling2D()(model)
+        model = Conv2D(512, kernel_size=3, padding="same")(model)
+        model = Activation("relu")(model)
+        model = BatchNormalization(momentum=0.8)(model)
+        model = UpSampling2D()(model)
+        model = Conv2D(256, kernel_size=3, padding="same")(model)
+        model = Activation("relu")(model)
         model = BatchNormalization(momentum=0.8)(model)
         model = UpSampling2D()(model)
         model = Conv2D(128, kernel_size=3, padding="same")(model)

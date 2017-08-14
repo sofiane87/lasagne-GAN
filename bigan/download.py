@@ -93,7 +93,7 @@ def reshape_celebA(path_to_data):
         # if len(images[i].shape) == 3:
         #     images[i] = np.expand_dims(images[i], 0)
     data = np.stack(images, axis=0).astype(np.float32)
-    np.save(os.path.join(path_to_data, 'celeb_64.npy'), data)
+    np.save(os.path.join(path_to_data, 'celeba.npy'), data)
 
 def download_celeb_a(dirpath):
     data_dir = 'celebA'
@@ -201,11 +201,20 @@ if __name__ == '__main__':
     args = parser.parse_args()
     prepare_data_dir()
 
+    import platform
+
+    if 'dd144dfd71f8' in platform.node().lower():
+        celeba_path = '/data/users/amp115/skin_analytics/inData'
+    elif 'alison' in  platform.node().lower()
+        celeba_path = '/Users/pouplinalison/Documents/skin_analytics/code_dcgan/inData'
+    else:
+        celeba_path = 'bigan/data'
+
     if 'celebA' in args.datasets:
-        download_celeb_a('./Data')
+        download_celeb_a(celeba_path)
     if 'cifar' in args.datasets:
-        download_cifar('./Data')
+        download_cifar(celeba_path)
     # if 'lsun' in args.datasets:
-    #     download_lsun('./data')
+    #     download_lsun(celeba_path)
     if 'mnist' in args.datasets:
-        download_mnist('./Data')
+        download_mnist(celeba_path)
