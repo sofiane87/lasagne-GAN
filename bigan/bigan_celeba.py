@@ -38,7 +38,7 @@ from bigan_root import BIGAN_ROOT
 
 class BIGAN(BIGAN_ROOT):
     def __init__(self,reload_model = False,interpolate_bool=False,celeba_path=celeba_path):
-        super(BIGAN, self).__init__(reload_model=reload_model,interpolate_bool=interpolate_bool,img_rows=64,img_cols=64,channels=3, save_folder='bigan/celeba/',optimizer_params = {"clipnorm" : 0.1, 'beta_1' : 0.5}, learningRate=0.00001)
+        super(BIGAN, self).__init__(reload_model=reload_model,interpolate_bool=interpolate_bool,img_rows=64,img_cols=64,channels=3, save_folder='bigan/celeba/',optimizer_dis_params = {"clipnorm" : 0.1, 'beta_1' : 0.5}, learningRate=0.00001)
         self.dataPath = celeba_path
     def build_encoder(self):
 
@@ -99,15 +99,15 @@ class BIGAN(BIGAN_ROOT):
 
 
         img = Input(shape=self.img_shape)
-        model_image = Conv2D(32, kernel_size=3, strides=2, padding="same")(img)
+        model_image = Conv2D(16, kernel_size=3, strides=2, padding="same")(img)
         model_image = LeakyReLU(alpha=0.2)(model_image)
         model_image = Dropout(0.25)(model_image)
-        model_image = Conv2D(64, kernel_size=3, strides=2, padding="same")(model_image)
+        model_image = Conv2D(32, kernel_size=3, strides=2, padding="same")(model_image)
         model_image = ZeroPadding2D(padding=((0,1),(0,1)))(model_image)
         model_image = LeakyReLU(alpha=0.2)(model_image)
         model_image = Dropout(0.25)(model_image)
         model_image = BatchNormalization(momentum=0.8)(model_image)
-        model_image = Conv2D(128, kernel_size=3, strides=2, padding="same")(model_image)
+        model_image = Conv2D(64, kernel_size=3, strides=2, padding="same")(model_image)
         model_image = LeakyReLU(alpha=0.2)(model_image)
         model_image = Dropout(0.25)(model_image)
         model_image = BatchNormalization(momentum=0.8)(model_image)

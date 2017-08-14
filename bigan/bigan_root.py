@@ -45,6 +45,8 @@ class BIGAN_ROOT(object):
         self.img_shape = (self.img_rows, self.img_cols, self.channels)
         self.latent_dim = 100
         self.reload = reload_model
+        self.optimizer_dis_params = optimizer_dis_params
+        self.optimizer_dis = optimizer_dis(**self.optimizer_dis_params)
         self.optimizer_params = optimizer_params
         self.optimizer_params['lr'] = learningRate
         self.optimizer = optimizer(**self.optimizer_params)
@@ -76,7 +78,7 @@ class BIGAN_ROOT(object):
         self.encoder.summary()
 
         self.discriminator.compile(loss=['binary_crossentropy'], 
-        optimizer=self.optimizer,
+        optimizer_dis=self.optimizer_dis,
         metrics=['accuracy'])
 
         self.generator.compile(loss=['binary_crossentropy'], 
