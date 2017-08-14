@@ -111,9 +111,9 @@ class BIGAN(BIGAN_ROOT):
         model_image = LeakyReLU(alpha=0.2)(model_image)
         model_image = Dropout(0.25)(model_image)
         model_image = BatchNormalization(momentum=0.8)(model_image)
-        model_image = Conv2D(256, kernel_size=3, strides=1, padding="same")(model_image)
-        model_image = LeakyReLU(alpha=0.2)(model_image)
-        model_image = Dropout(0.25)(model_image)
+        # model_image = Conv2D(256, kernel_size=3, strides=1, padding="same")(model_image)
+        # model_image = LeakyReLU(alpha=0.2)(model_image)
+        # model_image = Dropout(0.25)(model_image)
         
         model_image = Flatten()(model_image)
         model_image = Dense(self.latent_dim)(model_image)
@@ -128,12 +128,12 @@ class BIGAN(BIGAN_ROOT):
         model = Dense(100)(d_in)
         model = LeakyReLU(alpha=0.2)(model)
         model = Dropout(0.5)(model)
-        model = Dense(1024)(model)
-        model = LeakyReLU(alpha=0.2)(model)
-        model = Dropout(0.5)(model)
-        model = Dense(1024)(model)
-        model = LeakyReLU(alpha=0.2)(model)
-        model = Dropout(0.5)(model)
+        # model = Dense(1024)(model)
+        # model = LeakyReLU(alpha=0.2)(model)
+        # model = Dropout(0.5)(model)
+        # model = Dense(1024)(model)
+        # model = LeakyReLU(alpha=0.2)(model)
+        # model = Dropout(0.5)(model)
         validity = Dense(1, activation="sigmoid")(model)
 
 
@@ -158,7 +158,7 @@ if __name__ == '__main__':
         reload_bool = True
     if '-interpolate' in sys.argv[1:]:
         interpolate_bool = True
-    bigan = BIGAN(reload_model = reload_bool,interpolate_bool = interpolate_bool)
+    bigan = BIGAN(reload_model = reload_bool,interpolate_bool = interpolate_bool, learningRate=0.00005)
     bigan.run(epochs=50001, batch_size=128, save_interval=100)
 
 
