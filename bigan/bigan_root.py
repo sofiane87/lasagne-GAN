@@ -80,7 +80,7 @@ class BIGAN_ROOT(object):
         self.encoder.summary()
 
         self.discriminator.compile(loss=['binary_crossentropy'], 
-        optimizer_dis=self.optimizer_dis,
+        optimizer=self.optimizer_dis,
         metrics=['accuracy'])
 
         self.generator.compile(loss=['binary_crossentropy'], 
