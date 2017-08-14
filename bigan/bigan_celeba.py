@@ -155,7 +155,7 @@ if __name__ == '__main__':
     if '-interpolate' in sys.argv[1:]:
         interpolate_bool = True
     bigan = BIGAN(reload_model = reload_bool,interpolate_bool = interpolate_bool)
-    bigan.run(epochs=50001, batch_size=128, save_interval=100)
+    bigan.run(epochs=50001, batch_size=32, save_interval=100)
 
 
 
