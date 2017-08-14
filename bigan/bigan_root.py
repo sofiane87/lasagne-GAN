@@ -38,7 +38,7 @@ if 'tensorflow' in backend_name.lower():
 
 
 class BIGAN_ROOT(object):
-    def __init__(self,img_rows=28,img_cols=28,channels=1, optimizer = Adam, learningRate=0.00005,optimizer_params = {'beta_1' : 0.5}, reload_model = False,save_folder='bigan/',interpolate_bool=False,interpolate_params = {'n_intp':10,'idx':None,'save_idx' : True,'reload_idx':True,'n_steps' : 10}):
+    def __init__(self,img_rows=28,img_cols=28,channels=1, optimizer = Adam, optimizer_dis = Adam,  optimizer_dis_params={'beta_1' : 0.5},learningRate=0.00005,optimizer_params = {'beta_1' : 0.5}, reload_model = False,save_folder='bigan/',interpolate_bool=False,interpolate_params = {'n_intp':10,'idx':None,'save_idx' : True,'reload_idx':True,'n_steps' : 10}):
         self.img_rows =  img_rows 
         self.img_cols =  img_cols
         self.channels = channels
@@ -46,9 +46,11 @@ class BIGAN_ROOT(object):
         self.latent_dim = 100
         self.reload = reload_model
         self.optimizer_dis_params = optimizer_dis_params
-        self.optimizer_dis = optimizer_dis(**self.optimizer_dis_params)
         self.optimizer_params = optimizer_params
         self.optimizer_params['lr'] = learningRate
+        self.optimizer_dis_params['lr'] = learningRate
+
+        self.optimizer_dis = optimizer_dis(**self.optimizer_dis_params)
         self.optimizer = optimizer(**self.optimizer_params)
         self.save_model_folder = save_folder + 'saved_model/'
         self.save_img_folder = save_folder + 'images/'
