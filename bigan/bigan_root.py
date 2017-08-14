@@ -379,7 +379,7 @@ if __name__ == '__main__':
     reload_bool = True
     interpolate_bool = False
     bigan = BIGAN_ROOT(reload_model = reload_bool,interpolate=interpolate_bool)    
-    bigan.run(epochs=30001, batch_size=32, save_interval=100)
+    bigan.run(epochs=30001, batch_size=32, save_interval=100,learningRate=0.00005)
 
 
 
