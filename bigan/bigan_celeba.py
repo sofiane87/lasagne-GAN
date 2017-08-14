@@ -138,10 +138,10 @@ class BIGAN(BIGAN_ROOT):
     def load_data(self):
         print('----- Loading CelebA -------')
         X_train = np.load(self.dataPath)
-        print('CelebA shape:', X_train.shape)
-        #X_train = X_train.transpose([0,2,3,1])
+        X_train = X_train.transpose([0,2,3,1])
         # Rescale -1 to 1
         X_train = (X_train.astype(np.float32) - 127.5) / 127.5
+        print('CelebA shape:', X_train.shape, X_train.min, X_train.max)
         print('------- CelebA loaded -------')
         
         return X_train
