@@ -38,7 +38,7 @@ from bigan_root import BIGAN_ROOT
 
 class BIGAN(BIGAN_ROOT):
     def __init__(self,reload_model = False,interpolate_bool=False,celeba_path=celeba_path):
-        super(BIGAN, self).__init__(reload_model=reload_model,interpolate_bool=interpolate_bool,img_rows=64,img_cols=64,channels=3, save_folder='bigan/celeba/')
+        super(BIGAN, self).__init__(reload_model=reload_model,interpolate_bool=interpolate_bool,img_rows=64,img_cols=64,channels=3, save_folder='bigan/celeba/',optimizer_params = {"clipnorm" : 0.1, 'beta_1' : 0.5}, learningRate=0.00001)
         self.dataPath = celeba_path
     def build_encoder(self):
 
@@ -71,11 +71,11 @@ class BIGAN(BIGAN_ROOT):
 
         z = Input(shape=(self.latent_dim,))
 
-        model = Dense(256 * 4 * 4, activation="relu")(z)
-        model = Reshape((4, 4, 256))(model)
+        model = Dense(512 * 4 * 4, activation="relu")(z)
+        model = Reshape((4, 4, 512))(model)
         model = BatchNormalization(momentum=0.8)(model)
         model = UpSampling2D()(model)
-        model = Conv2D(128, kernel_size=3, padding="same")(model)
+        model = Conv2D(256, kernel_size=3, padding="same")(model)
         model = Activation("relu")(model)
         model = BatchNormalization(momentum=0.8)(model)
         model = UpSampling2D()(model)
