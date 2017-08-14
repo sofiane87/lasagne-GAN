@@ -312,6 +312,14 @@ class BIGAN():
 
     #     return Model([z, img], validity)
 
+    def load_data(self):
+        print('---- loading MNIST -----')
+        (X_train, _), (_, _) = mnist.load_data()
+        # Rescale -1 to 1
+        X_train = (X_train.astype(np.float32) - 127.5) / 127.5
+        X_train = np.expand_dims(X_train, axis=3)
+        print('----- MNIST loaded ------')
+        return X_train
 
     def model_save(self):
         self.encoder.save('bigan/saved_model/encoder.h5')

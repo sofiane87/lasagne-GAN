@@ -68,8 +68,11 @@ class BIGAN_ROOT(object):
             # Build and compile the encoder
             self.encoder = self.build_encoder()
 
+        print ('disciminator model')
         self.discriminator.summary()
+        print ('generator model')
         self.generator.summary()
+        print ('encoder model')
         self.encoder.summary()
 
         self.discriminator.compile(loss=['binary_crossentropy'], 
@@ -112,6 +115,9 @@ class BIGAN_ROOT(object):
     def build_discriminator(self):
         raise NotImplementedError
 
+    def load_data(self):
+        raise NotImplementedError
+
     def model_save(self):
         if not(os.path.exists(self.save_model_folder)):
             os.makedirs(self.save_model_folder)
@@ -132,14 +138,7 @@ class BIGAN_ROOT(object):
 
         print('--------------- loading done ----------------')
 
-    def load_data(self):
-        # Load the dataset
-        (X_train, _), (_, _) = mnist.load_data()
-        # Rescale -1 to 1
-        X_train = (X_train.astype(np.float32) - 127.5) / 127.5
-        X_train = np.expand_dims(X_train, axis=3)
 
-        return X_train
 
     def run_interpolation(self,n_intp=10,idx=None,save_idx = True,reload_idx=True,n_steps = 10):
         
