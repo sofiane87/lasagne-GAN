@@ -38,7 +38,7 @@ if 'tensorflow' in backend_name.lower():
 
 
 class BIGAN_ROOT(object):
-    def __init__(self,img_rows=28,img_cols=28,channels=1, optimizer = Adam, learningRate=0.0002,optimizer_params = {'beta_1' : 0.5}, reload_model = False,save_folder='bigan/',interpolate_bool=False,interpolate_params = {'n_intp':10,'idx':None,'save_idx' : True,'reload_idx':True,'n_steps' : 10}):
+    def __init__(self,img_rows=28,img_cols=28,channels=1, optimizer = Adam, learningRate=0.00005,optimizer_params = {'beta_1' : 0.5}, reload_model = False,save_folder='bigan/',interpolate_bool=False,interpolate_params = {'n_intp':10,'idx':None,'save_idx' : True,'reload_idx':True,'n_steps' : 10}):
         self.img_rows =  img_rows 
         self.img_cols =  img_cols
         self.channels = channels
@@ -379,7 +379,7 @@ if __name__ == '__main__':
     reload_bool = True
     interpolate_bool = False
     bigan = BIGAN_ROOT(reload_model = reload_bool,interpolate=interpolate_bool)    
-    bigan.run(epochs=30001, batch_size=32, save_interval=100,learningRate=0.00005)
+    bigan.run(epochs=30001, batch_size=32, save_interval=100)
 
 
 
