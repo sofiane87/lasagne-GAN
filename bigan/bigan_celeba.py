@@ -29,7 +29,7 @@ import platform
 
 if 'dd144dfd71f8' in platform.node().lower():
     celeba_path = '/data/users/amp115/skin_analytics/inData/celeba.npy'
-elif 'alison' in  platform.node().lower()
+elif 'alison' in  platform.node().lower():
     celeba_path = '/Users/pouplinalison/Documents/skin_analytics/code_dcgan/inData/celeba.npy'
 else:
     celeba_path = 'bigan/data/celeba.npy'
