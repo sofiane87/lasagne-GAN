@@ -38,7 +38,7 @@ from bigan_root import BIGAN_ROOT
 
 class BIGAN(BIGAN_ROOT):
     def __init__(self,reload_model = False,interpolate_bool=False,celeba_path=celeba_path):
-        super(BIGAN, self).__init__(reload_model=reload_model,interpolate_bool=interpolate_bool,img_rows=64,img_cols=64,channels=3, save_folder='bigan/celeba/',optimizer_dis_params = {"clipnorm" : 0.1, 'beta_1' : 0.5}, learningRate=0.00005)
+        super(BIGAN, self).__init__(reload_model=reload_model,interpolate_bool=interpolate_bool,img_rows=64,img_cols=64,channels=3, save_folder='bigan/celeba/',optimizer_params = {"clipnorm" : 0.1, 'beta_1' : 0.5}, learningRate=0.00005)
         self.dataPath = celeba_path
     def build_encoder(self):
 
