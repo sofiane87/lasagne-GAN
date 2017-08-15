@@ -37,7 +37,7 @@ class DCGAN():
 
         ### generator params
         self.initial_filters = 512
-        self.start_dim = int(s / 16)
+        self.start_dim = int(self.img_cols / 16)
         self.nb_upconv = 4
         self.bn_axis = -1    
         self.initial_reshape_shape = (self.start_dim, self.start_dim, self.initial_filters)
