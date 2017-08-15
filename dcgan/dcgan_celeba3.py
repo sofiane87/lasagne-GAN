@@ -76,7 +76,6 @@ class DCGAN():
 
     def build_generator(self):
 
-
         noise_shape = (self.latent_dim,)
         
         model = Sequential()
