@@ -82,7 +82,7 @@ class DCGAN():
         model = Sequential()
 
         model.add(Dense(self.initial_filters * self.start_dim * self.start_dim, input_shape=noise_shape))
-        model.add(Reshape(initial_reshape_shape))
+        model.add(Reshape(self.initial_reshape_shape))
         model.add(BatchNormalization(axis=self.bn_axis))
 
         for i in range(nb_upconv):
