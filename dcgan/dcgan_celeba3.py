@@ -83,13 +83,13 @@ class DCGAN():
 
         model.add(Dense(self.initial_filters * self.start_dim * self.start_dim, input_dim=noise_dim,input_shape=noise_shape))
         model.add(Reshape(initial_reshape_shape))
-        model.add(BatchNormalization(mode=self.bn_mode, axis=self.bn_axis))
+        model.add(BatchNormalization(axis=self.bn_axis))
 
         for i in range(nb_upconv):
             model.add(UpSampling2D(size=(2, 2)))
             nb_filters = int(f / (2 ** (i + 1)))
             model.add(Conv2D(nb_filters, 3, 3, border_mode="same"))
-            model.add(BatchNormalization(mode=self.bn_mode, axis=1))
+            model.add(BatchNormalization(axis=1))
             model.add(Activation("relu"))
             model.add(Convolution2D(nb_filters, 3, 3, border_mode="same"))            
             model.add(Activation("relu"))
@@ -112,14 +112,14 @@ class DCGAN():
 
         # First conv
         x = Conv2D(32, 3, 3, subsample=(2, 2), name="disc_convolution2d_1", border_mode="same")(img)
-        x = BatchNormalization(mode=self.bn_mode, axis=self.bn_axis)(x)
+        x = BatchNormalization(axis=self.bn_axis)(x)
         x = LeakyReLU(0.2)(x)
 
         # Next convs
         for i, f in enumerate(self.list_f):
             name = "disc_convolution2d_%s" % (i + 2)
             x = Conv2D(f, 3, 3, subsample=(2, 2), name=name, border_mode="same")(x)
-            x = BatchNormalization(mode=self.bn_mode, axis=self.bn_axis)(x)
+            x = BatchNormalization(axis=self.bn_axis)(x)
             x = LeakyReLU(0.2)(x)
 
         x = Flatten()(x)
