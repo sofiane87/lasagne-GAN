@@ -111,14 +111,14 @@ class DCGAN():
         img = Input(shape=img_shape)
 
         # First conv
-        x = Conv2D(32, 3, 3, subsample=(2, 2), name="disc_convolution2d_1", border_mode="same")(img)
+        x = Conv2D(32, (3, 3), strides=(2, 2), name="disc_convolution2d_1", border_mode="same")(img)
         x = BatchNormalization(axis=self.bn_axis)(x)
         x = LeakyReLU(0.2)(x)
 
         # Next convs
         for i, f in enumerate(self.list_f):
             name = "disc_convolution2d_%s" % (i + 2)
-            x = Conv2D(f, 3, 3, subsample=(2, 2), name=name, border_mode="same")(x)
+            x = Conv2D(f, (3, 3), strides=(2, 2), name=name, border_mode="same")(x)
             x = BatchNormalization(axis=self.bn_axis)(x)
             x = LeakyReLU(0.2)(x)
 
