@@ -87,14 +87,14 @@ class DCGAN():
         for i in range(self.nb_upconv):
             model.add(UpSampling2D(size=(2, 2)))
             nb_filters = int(self.initial_filters / (2 ** (i + 1)))
-            model.add(Conv2D(nb_filters, (3, 3), border_mode="same"))
+            model.add(Conv2D(nb_filters, (3, 3), padding="same"))
             model.add(BatchNormalization(axis=1))
             model.add(Activation("relu"))
-            model.add(Conv2D(nb_filters, (3, 3), border_mode="same"))            
+            model.add(Conv2D(nb_filters, (3, 3), padding="same"))            
             model.add(Activation("relu"))
 
 
-        model.add(Conv2D(self.channels, (3, 3), name="gen_convolution2d_final", border_mode="same", activation='tanh'))
+        model.add(Conv2D(self.channels, (3, 3), name="gen_convolution2d_final", padding="same", activation='tanh'))
 
         model.summary()
 
@@ -110,14 +110,14 @@ class DCGAN():
         img = Input(shape=img_shape)
 
         # First conv
-        x = Conv2D(32, (3, 3), strides=(2, 2), name="disc_convolution2d_1", border_mode="same")(img)
+        x = Conv2D(32, (3, 3), strides=(2, 2), name="disc_convolution2d_1", padding="same")(img)
         x = BatchNormalization(axis=self.bn_axis)(x)
         x = LeakyReLU(0.2)(x)
 
         # Next convs
         for i, f in enumerate(self.list_f):
             name = "disc_convolution2d_%s" % (i + 2)
-            x = Conv2D(f, (3, 3), strides=(2, 2), name=name, border_mode="same")(x)
+            x = Conv2D(f, (3, 3), strides=(2, 2), name=name, padding="same")(x)
             x = BatchNormalization(axis=self.bn_axis)(x)
             x = LeakyReLU(0.2)(x)
 
