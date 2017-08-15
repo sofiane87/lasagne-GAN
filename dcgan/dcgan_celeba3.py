@@ -88,14 +88,14 @@ class DCGAN():
         for i in range(self.nb_upconv):
             model.add(UpSampling2D(size=(2, 2)))
             nb_filters = int(self.initial_filters / (2 ** (i + 1)))
-            model.add(Conv2D(nb_filters, 3, 3, border_mode="same"))
+            model.add(Conv2D(nb_filters, (3, 3), border_mode="same"))
             model.add(BatchNormalization(axis=1))
             model.add(Activation("relu"))
-            model.add(Conv2D(nb_filters, 3, 3, border_mode="same"))            
+            model.add(Conv2D(nb_filters, (3, 3), border_mode="same"))            
             model.add(Activation("relu"))
 
 
-        model.add(Conv2D(self.channels, 3, 3, name="gen_convolution2d_final", border_mode="same", activation='tanh'))
+        model.add(Conv2D(self.channels, (3, 3), name="gen_convolution2d_final", border_mode="same", activation='tanh'))
 
         model.summary()
 
