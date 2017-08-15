@@ -91,7 +91,7 @@ class DCGAN():
             model.add(Conv2D(nb_filters, 3, 3, border_mode="same"))
             model.add(BatchNormalization(axis=1))
             model.add(Activation("relu"))
-            model.add(Convolution2D(nb_filters, 3, 3, border_mode="same"))            
+            model.add(Conv2D(nb_filters, 3, 3, border_mode="same"))            
             model.add(Activation("relu"))
 
 
