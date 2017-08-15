@@ -85,7 +85,7 @@ class DCGAN():
         model.add(Reshape(self.initial_reshape_shape))
         model.add(BatchNormalization(axis=self.bn_axis))
 
-        for i in range(nb_upconv):
+        for i in range(self.nb_upconv):
             model.add(UpSampling2D(size=(2, 2)))
             nb_filters = int(f / (2 ** (i + 1)))
             model.add(Conv2D(nb_filters, 3, 3, border_mode="same"))
