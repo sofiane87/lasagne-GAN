@@ -112,14 +112,14 @@ class DCGAN():
 
         # First conv
         x = Conv2D(32, 3, 3, subsample=(2, 2), name="disc_convolution2d_1", border_mode="same")(img)
-        x = BatchNormalization(mode=bn_mode, axis=bn_axis)(x)
+        x = BatchNormalization(mode=self.bn_mode, axis=self.bn_axis)(x)
         x = LeakyReLU(0.2)(x)
 
         # Next convs
         for i, f in enumerate(self.list_f):
             name = "disc_convolution2d_%s" % (i + 2)
             x = Conv2D(f, 3, 3, subsample=(2, 2), name=name, border_mode="same")(x)
-            x = BatchNormalization(mode=bn_mode, axis=bn_axis)(x)
+            x = BatchNormalization(mode=self.bn_mode, axis=self.bn_axis)(x)
             x = LeakyReLU(0.2)(x)
 
         x = Flatten()(x)
