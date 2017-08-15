@@ -8,6 +8,8 @@ from keras.layers.convolutional import UpSampling2D, Conv2D
 from keras.models import Sequential, Model
 from keras.optimizers import Adam, SGD
 
+import keras.backend as K
+
 import matplotlib.pyplot as plt
 
 import sys
