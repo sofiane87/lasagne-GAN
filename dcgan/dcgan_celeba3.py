@@ -2,7 +2,7 @@ from __future__ import print_function
 
 from keras.datasets import mnist
 from keras.layers import Input, Dense, Reshape, Flatten, merge
-from keras.layers import BatchNormalization, Activation, ZeroPadding2D, Lambda
+from keras.layers import BatchNormalization, Activation, ZeroPadding2D, Lambda, concatenate
 from keras.layers.advanced_activations import LeakyReLU
 from keras.layers.convolutional import UpSampling2D, Conv2D
 from keras.models import Sequential, Model
@@ -142,7 +142,7 @@ class DCGAN():
             x_mbd = M(x)
             x_mbd = Reshape((self.num_kernels, self.dim_per_kernel))(x_mbd)
             x_mbd = MBD(x_mbd)
-            x = merge([x, x_mbd], mode='concat')
+            x = concatenate([x, x_mbd])
 
         x = Dense(1, activation='sigmoid', name="disc_dense_2")(x)
 
