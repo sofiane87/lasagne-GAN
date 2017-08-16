@@ -398,7 +398,7 @@ class BIGAN_ROOT(object):
 
 
 if __name__ == '__main__':
-    reload_bool = True
+    reload_bool = False
     interpolate_bool = False
     preload=False
     bigan = BIGAN_ROOT(reload_model = reload_bool,interpolate=interpolate_bool,preload=preload)    

@@ -181,8 +181,10 @@ class BIGAN(BIGAN_ROOT):
 if __name__ == '__main__':
     reload_bool = False
     interpolate_bool = False
-    preload=True
+    preload=False
     start_iteration = 50001
+    if '-preload' in sys.argv[1:]:
+        preload = True
     if '-test' in sys.argv[1:]:
         reload_bool = True
     if '-interpolate' in sys.argv[1:]:
