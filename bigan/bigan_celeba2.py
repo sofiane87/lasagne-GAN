@@ -28,10 +28,7 @@ import platform
 print('platform : ', platform.node().lower())
 
 if 'dd144dfd71f8' in platform.node().lower():
-    if sceleba : 
-        celeba_path = '/data/users/amp115/skin_analytics/inData/sceleba.npy'
-    else : 
-        celeba_path = '/data/users/amp115/skin_analytics/inData/celeba.npy'
+    celeba_path = '/data/users/amp115/skin_analytics/inData/sceleba.npy'
 elif 'alison' in  platform.node().lower():
     celeba_path = '/Users/pouplinalison/Documents/skin_analytics/code_dcgan/inData/celeba.npy'
 elif 'desktop' in  platform.node().lower():
@@ -186,16 +183,14 @@ if __name__ == '__main__':
     interpolate_bool = False
     preload=False
     start_iteration = 50001
-    sceleba = False
     if '-preload' in sys.argv[1:]:
         preload = True
     if '-test' in sys.argv[1:]:
         reload_bool = True
     if '-interpolate' in sys.argv[1:]:
         interpolate_bool = True
-    if '-sceleba' in sys.argv[1:]:
-        sceleba = True
-    bigan = BIGAN(reload_model = reload_bool,interpolate_bool = interpolate_bool,preload=preload, sceleba = sceleba)
+
+    bigan = BIGAN(reload_model = reload_bool,interpolate_bool = interpolate_bool,preload=preload,)
     bigan.run(epochs=50001, batch_size=128, save_interval=100,start_iteration=start_iteration)
 
 
