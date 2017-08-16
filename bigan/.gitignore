@@ -1,0 +1,4 @@
+# ignore PNG and Models
+*.npy
+*.png
+*.h5
