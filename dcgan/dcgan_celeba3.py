@@ -30,8 +30,8 @@ class DCGAN():
         self.img_cols = 64
         self.channels = 3
         self.save_img_folder = 'dcgan/images/'
-        optimizer =  Adam(lr=1E-3, beta_1=0.5, beta_2=0.999, epsilon=1e-08)
-        optimizer_dis = SGD(lr=1E-3, momentum=0.9, nesterov=True)
+        optimizer =  Adam(lr=1e-3, beta_1=0.5, beta_2=0.999, epsilon=1e-08)
+        optimizer_dis = SGD(lr=1e-3, momentum=0.9, nesterov=True)
         self.latent_dim = 100
 
 
@@ -44,7 +44,7 @@ class DCGAN():
         self.bn_mode = 2
 
         ### discriminator params
-        self.list_f = [64, 128, 256]
+        self.list_f = [64,128,256]
         self.num_kernels = 100
         self.dim_per_kernel = 5
         self.use_mbd = True
@@ -260,8 +260,8 @@ class DCGAN():
         print('----- Loading CelebA -------')
         X_train = np.load(self.dataPath)
         X_train = X_train.transpose([0,2,3,1])
-        # Rescale -1 to 1
-        X_train = (X_train.astype(np.float32) - 127.5) / 127.5
+        X_train = (X_train.astype(np.float32) - 0.5) / 0.5
+
         print('CelebA shape:', X_train.shape, X_train.min(), X_train.max())
         print('------- CelebA loaded -------')
         
@@ -272,7 +272,7 @@ class DCGAN():
             fig.imshow(img,cmap=self.cmap)
             fig.axis('off')
         else:
-            fig.imshow(img*255)
+            fig.imshow(img)
             fig.axis('off')
 
 

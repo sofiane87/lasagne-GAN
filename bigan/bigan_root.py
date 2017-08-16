@@ -43,12 +43,13 @@ class BIGAN_ROOT(object):
                 learningRate=0.00005,optimizer_params = {'beta_1' : 0.5}, reload_model = False,
                 save_folder='bigan/',interpolate_bool=False,
                 interpolate_params = {'n_intp':10,'idx':None,'save_idx' : True ,'reload_idx':True,'n_steps' : 10},
-                learningRate_dis=0.00005, clip_dis_weight = False,dis_clip_value = 0.2):
+                learningRate_dis=0.00005, clip_dis_weight = False,dis_clip_value = 0.2,
+                latent_dim = 100):
         self.img_rows =  img_rows 
         self.img_cols =  img_cols
         self.channels = channels
         self.img_shape = (self.img_rows, self.img_cols, self.channels)
-        self.latent_dim = 100
+        self.latent_dim = latent_dim
         self.reload = reload_model
         self.optimizer_dis_params = optimizer_dis_params
         self.optimizer_params = optimizer_params
@@ -271,11 +272,11 @@ class BIGAN_ROOT(object):
             d_loss_fake = self.discriminator.train_on_batch([z, imgs_], fake)
             d_loss = 0.5 * np.add(d_loss_real, d_loss_fake)
 
-            if self.clip_dis_weight :
-                for l in self.discriminator.layers:
-                    weights = l.get_weights()
-                    weights = [np.clip(w, -self.dis_clip_value, self.dis_clip_value) for w in weights]
-                    l.set_weights(weights)
+            # if self.clip_dis_weight :
+            #     for l in self.discriminator.layers:
+            #         weights = l.get_weights()
+            #         weights = [np.clip(w, -self.dis_clip_value, self.dis_clip_value) for w in weights]
+            #         l.set_weights(weights)
 
 
 
@@ -387,7 +388,7 @@ class BIGAN_ROOT(object):
             fig.imshow(img,cmap=self.cmap)
             fig.axis('off')
         else:
-            fig.imshow(img*255)
+            fig.imshow(img)
             fig.axis('off')
 
 

@@ -4,7 +4,7 @@ from keras.layers import Input, Dense, Reshape, Flatten, Dropout, multiply, Gaus
 from keras.layers import BatchNormalization, Activation, Embedding, ZeroPadding2D
 from keras.layers import MaxPooling2D, concatenate
 from keras.layers.advanced_activations import LeakyReLU
-from ker0as.layers.convolutional import UpSampling2D, Conv2D
+from keras.layers.convolutional import UpSampling2D, Conv2D
 from keras.layers.merge import Multiply
 from keras.models import Sequential, Model
 from keras.optimizers import Adam,RMSprop, SGD
@@ -42,31 +42,31 @@ from bigan_root import BIGAN_ROOT
 class BIGAN(BIGAN_ROOT):
     def __init__(self,reload_model = False,interpolate_bool=False,celeba_path=celeba_path):
         super(BIGAN, self).__init__(reload_model=reload_model,interpolate_bool=interpolate_bool,
-                                    img_rows=64,img_cols=64,channels=3, save_folder='bigan/celeba/',
-                                    optimizer_dis = Adam,optimizer = Adam, optimizer_params={}, 
-                                    optimizer_dis_params={},learningRate=0.0001,learningRate_dis=0.0001, 
-                                    clip_dis_weight = False)
+                                    img_rows=64,img_cols=64,channels=3, save_folder='bigan/celeba/')
+
         self.dataPath = celeba_path
+   
+
     def build_encoder(self):
 
         img = Input(shape=self.img_shape)
 
         model = Conv2D(64, kernel_size=3, strides=2, input_shape=self.img_shape, padding="same")(img)
         model = LeakyReLU(alpha=0.02)(model)
-        # model = Dropout(0.25)(model)
+        model = Dropout(0.25)(model)
         model = Conv2D(128, kernel_size=3, strides=2, padding="same")(model)
         model = ZeroPadding2D(padding=((0,1),(0,1)))(model)
         model = LeakyReLU(alpha=0.02)(model)
-        # model = Dropout(0.25)(model)
+        model = Dropout(0.25)(model)
         model = BatchNormalization(momentum=0.8)(model)
         model = Conv2D(256, kernel_size=3, strides=2, padding="same")(model)
         model = LeakyReLU(alpha=0.02)(model)
-        # model = Dropout(0.25)(model)
+        model = Dropout(0.25)(model)
         model = BatchNormalization(momentum=0.8)(model)
         model = Conv2D(512, kernel_size=3, strides=1, padding="same")(model)
         model = LeakyReLU(alpha=0.02)(model)
         model = BatchNormalization(momentum=0.8)(model)
-        # model = Dropout(0.25)(model)
+        model = Dropout(0.25)(model)
         model = Flatten()(model)
         z = Dense(self.latent_dim)(model)
 
@@ -111,19 +111,19 @@ class BIGAN(BIGAN_ROOT):
         model_image = LeakyReLU(alpha=0.02)(model_image)
         model_image = BatchNormalization(momentum=0.8)(model_image)
 
-        # model_image = Dropout(0.25)(model_image)
+        model_image = Dropout(0.25)(model_image)
         model_image = Conv2D(32, kernel_size=3, strides=2, padding="same")(model_image)
         model_image = ZeroPadding2D(padding=((0,1),(0,1)))(model_image)
         model_image = LeakyReLU(alpha=0.02)(model_image)
-        # model_image = Dropout(0.25)(model_image)
-        # model_image = BatchNormalization(momentum=0.8)(model_image)
-        # model_image = Conv2D(64, kernel_size=3, strides=2, padding="same")(model_image)
-        # model_image = LeakyReLU(alpha=0.02)(model_image)
-        # # model_image = Dropout(0.25)(model_image)
-        # model_image = BatchNormalization(momentum=0.8)(model_image)
-        # # model_image = Conv2D(256, kernel_size=3, strides=1, padding="same")(model_image)
-        # # model_image = LeakyReLU(alpha=0.02)(model_image)
-        # # # model_image = Dropout(0.25)(model_image)
+        model_image = Dropout(0.25)(model_image)
+        model_image = BatchNormalization(momentum=0.8)(model_image)
+        model_image = Conv2D(64, kernel_size=3, strides=2, padding="same")(model_image)
+        model_image = LeakyReLU(alpha=0.02)(model_image)
+        model_image = Dropout(0.25)(model_image)
+        model_image = BatchNormalization(momentum=0.8)(model_image)
+        model_image = Conv2D(256, kernel_size=3, strides=1, padding="same")(model_image)
+        model_image = LeakyReLU(alpha=0.02)(model_image)
+        model_image = Dropout(0.25)(model_image)
         
         model_image = Flatten()(model_image)
         model_image = Dense(self.latent_dim)(model_image)
@@ -135,23 +135,23 @@ class BIGAN(BIGAN_ROOT):
         # d_in = concatenate([model_image,model_z,multiply([model_image,model_z])])
         d_in = concatenate([model_image,model_z])
 
-        model = Dense(100)(d_in)
+        model = Dense(1024)(d_in)
         model = LeakyReLU(alpha=0.02)(model)
-        # model = Dropout(0.25)(model)
-        # # model = BatchNormalization(momentum=0.8)(model)
-        # model = Dense(1000)(d_in)
-        # model = LeakyReLU(alpha=0.02)(model)
-        # model = Dropout(0.25)(model)
-        # # model = BatchNormalization(momentum=0.8)(model)
-        # model = Dense(1024)(model)
-        # model = LeakyReLU(alpha=0.02)(model)
-        # # model = Dropout(0.25)(model)
-        # # model = BatchNormalization(momentum=0.8)(model)
+        model = Dropout(0.25)(model)
+        model = BatchNormalization(momentum=0.8)(model)
+        model = Dense(1024)(d_in)
+        model = LeakyReLU(alpha=0.02)(model)
+        model = Dropout(0.25)(model)
+        model = BatchNormalization(momentum=0.8)(model)
+        model = Dense(1024)(model)
+        model = LeakyReLU(alpha=0.02)(model)
+        model = Dropout(0.25)(model)
+        model = BatchNormalization(momentum=0.8)(model)
 
-        # model = Dense(1024)(model)
-        # model = LeakyReLU(alpha=0.02)(model)
-        # # model = Dropout(0.25)(model)
-        # # model = BatchNormalization(momentum=0.8)(model)
+        model = Dense(1024)(model)
+        model = LeakyReLU(alpha=0.02)(model)
+        model = Dropout(0.25)(model)
+        model = BatchNormalization(momentum=0.8)(model)
 
         validity = Dense(1, activation="sigmoid")(model)
 
@@ -163,7 +163,7 @@ class BIGAN(BIGAN_ROOT):
         X_train = np.load(self.dataPath)
         X_train = X_train.transpose([0,2,3,1])
         # Rescale -1 to 1
-        X_train = (X_train.astype(np.float32) - 127.5) / 127.5
+        X_train = (X_train.astype(np.float32) - 0.5) / 0.5
         print('CelebA shape:', X_train.shape, X_train.min(), X_train.max())
         print('------- CelebA loaded -------')
         

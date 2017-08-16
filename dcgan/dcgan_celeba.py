@@ -22,7 +22,8 @@ class DCGAN():
         self.channels = 3
         self.save_img_folder = 'dcgan/images/'
         optimizer = Adam(0.0002, 0.5)
-        optimizer_dis = SGD(0.0002, 0.5)
+        optimizer_dis = Adam(0.0002, 0.5)
+
 
         self.latent_dim = 200
         # Build and compile the discriminator
@@ -218,15 +219,14 @@ class DCGAN():
             plt.close()
 
 
-
     def load_data(self):
         self.dataPath = 'D:\Code\data\sceleba.npy'
 
         print('----- Loading CelebA -------')
         X_train = np.load(self.dataPath)
         X_train = X_train.transpose([0,2,3,1])
-        # Rescale -1 to 1
-        X_train = (X_train.astype(np.float32) - 127.5) / 127.5
+        X_train = (X_train.astype(np.float32) - 0.5) / 0.5
+
         print('CelebA shape:', X_train.shape, X_train.min(), X_train.max())
         print('------- CelebA loaded -------')
         
@@ -237,8 +237,9 @@ class DCGAN():
             fig.imshow(img,cmap=self.cmap)
             fig.axis('off')
         else:
-            fig.imshow(img*255)
+            fig.imshow(img)
             fig.axis('off')
+
 
 
 if __name__ == '__main__':

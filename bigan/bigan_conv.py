@@ -30,25 +30,34 @@ class BIGAN(BIGAN_ROOT):
         super(BIGAN, self).__init__(reload_model=reload_model,interpolate_bool=interpolate_bool)
 
     def build_encoder(self):
+        img_shape = (self.img_rows, self.img_cols, self.channels)
+        
+        model = Sequential()
 
-        img = Input(shape=self.img_shape)
+        model.add(Conv2D(32, kernel_size=3, strides=2, input_shape=img_shape, padding="same"))
+        model.add(LeakyReLU(alpha=0.2))
+        model.add(Dropout(0.25))
+        model.add(Conv2D(64, kernel_size=3, strides=2, padding="same"))
+        model.add(ZeroPadding2D(padding=((0,1),(0,1))))
+        model.add(LeakyReLU(alpha=0.2))
+        model.add(Dropout(0.25))
+        model.add(BatchNormalization(momentum=0.8))
+        model.add(Conv2D(128, kernel_size=3, strides=2, padding="same"))
+        model.add(LeakyReLU(alpha=0.2))
+        model.add(Dropout(0.25))
+        model.add(BatchNormalization(momentum=0.8))
+        model.add(Conv2D(256, kernel_size=3, strides=1, padding="same"))
+        model.add(LeakyReLU(alpha=0.2))
+        model.add(Dropout(0.25))
 
-        model = Conv2D(32, kernel_size=3, strides=2, input_shape=self.img_shape, padding="same")(img)
-        model = LeakyReLU(alpha=0.2)(model)
-        model = Dropout(0.25)(model)
-        model = Conv2D(64, kernel_size=3, strides=2, padding="same")(model)
-        model = ZeroPadding2D(padding=((0,1),(0,1)))(model)
-        model = LeakyReLU(alpha=0.2)(model)
-        model = Dropout(0.25)(model)
-        model = BatchNormalization(momentum=0.8)(model)
-        model = Conv2D(128, kernel_size=3, strides=2, padding="same")(model)
-        model = LeakyReLU(alpha=0.2)(model)
-        model = Dropout(0.25)(model)
-        model = BatchNormalization(momentum=0.8)(model)
-        model = Conv2D(256, kernel_size=3, strides=1, padding="same")(model)
-        model = LeakyReLU(alpha=0.2)(model)
-        model = Dropout(0.25)(model)
-        model = Flatten()(model)
+        model.add(Flatten())
+        model.add(Dense(1, activation='sigmoid'))
+
+        model.summary()
+
+        img = Input(shape=img_shape)
+        validity = model(img)
+
         z = Dense(self.latent_dim)(model)
 
 
@@ -120,7 +129,14 @@ class BIGAN(BIGAN_ROOT):
 
         return Model([z, img], validity)
 
-
+    def load_data(self):
+        print('---- loading MNIST -----')
+        (X_train, _), (_, _) = mnist.load_data()
+        # Rescale -1 to 1
+        X_train = (X_train.astype(np.float32) - 127.5) / 127.5
+        X_train = np.expand_dims(X_train, axis=3)
+        print('----- MNIST loaded ------')
+        return X_train
 
 
 if __name__ == '__main__':
