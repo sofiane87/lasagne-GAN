@@ -349,9 +349,9 @@ class BIGAN_ROOT(object):
         
         print('----- Saving generated -----')
         if isinstance(epoch, str):
-            fig.savefig(self.save_img_folder + "mnist_{}.png".format(epoch))
+            fig.savefig(self.save_img_folder + "{}_gen.png".format(epoch))
         else:
-            fig.savefig(self.save_img_folder + "mnist_%d.png" % epoch)
+            fig.savefig(self.save_img_folder + "%d_gen.png" % epoch)
         plt.close()
 
 
@@ -363,9 +363,9 @@ class BIGAN_ROOT(object):
                 cnt += 1
         print('----- Saving encoded -----')
         if isinstance(epoch, str):
-            fig.savefig(self.save_img_folder + "mnist_{}_enc.png".format(epoch))
+            fig.savefig(self.save_img_folder + "{}_enc.png".format(epoch))
         else : 
-            fig.savefig(self.save_img_folder + "mnist_%d_enc.png" % epoch)
+            fig.savefig(self.save_img_folder + "%d_enc.png" % epoch)
         plt.close()
 
         fig, axs = plt.subplots(r, c)
@@ -378,9 +378,9 @@ class BIGAN_ROOT(object):
         
         print('----- Saving real -----')
         if isinstance(epoch, str):
-            fig.savefig(self.save_img_folder + "mnist_{}_real.png".format(epoch))
+            fig.savefig(self.save_img_folder + "{}_real.png".format(epoch))
         else : 
-            fig.savefig(self.save_img_folder + "mnist_%d_real.png" % epoch)
+            fig.savefig(self.save_img_folder + "%d_real.png" % epoch)
         plt.close()
 
 
