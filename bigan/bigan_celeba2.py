@@ -46,6 +46,8 @@ class BIGAN(BIGAN_ROOT):
                                     ,latent_dim=200,preload=preload)
         
         self.dataPath = celeba_path
+        print save_folder
+
    
 
 
