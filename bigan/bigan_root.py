@@ -44,13 +44,14 @@ class BIGAN_ROOT(object):
                 save_folder='bigan/',interpolate_bool=False,
                 interpolate_params = {'n_intp':10,'idx':None,'save_idx' : True ,'reload_idx':True,'n_steps' : 10},
                 learningRate_dis=0.00005, clip_dis_weight = False,dis_clip_value = 0.2,
-                latent_dim = 100):
+                latent_dim = 100,preload=False):
         self.img_rows =  img_rows 
         self.img_cols =  img_cols
         self.channels = channels
         self.img_shape = (self.img_rows, self.img_cols, self.channels)
         self.latent_dim = latent_dim
         self.reload = reload_model
+        self.preload = preload or reload_model
         self.optimizer_dis_params = optimizer_dis_params
         self.optimizer_params = optimizer_params
         self.optimizer_params['lr'] = learningRate
@@ -72,7 +73,7 @@ class BIGAN_ROOT(object):
 
 
         # Build and compile the generator
-        if self.reload :
+        if self.preload :
             self.model_load()
         else:
             # Build and compile the discriminator
@@ -241,14 +242,14 @@ class BIGAN_ROOT(object):
         windowmanager.window.wm_geometry("+0+0")
         fig.show()
 
-    def train(self, epochs, batch_size=128, save_interval=50):
+    def train(self, epochs, batch_size=128, save_interval=50,start_iteration=0):
 
 
         X_train = self.load_data()
 
         half_batch = int(batch_size / 2)
 
-        for epoch in range(epochs):
+        for epoch in range(start_iteration,start_iteration+epochs):
             start_time = time()
 
             # ---------------------
@@ -315,9 +316,9 @@ class BIGAN_ROOT(object):
         self.save_imgs('test',imgs)
         print('done...')
 
-    def run(self,epochs=30001, batch_size=32, save_interval=100):
+    def run(self,epochs=30001, batch_size=32, save_interval=100,start_iteration=0):
         if not(self.reload) :
-            self.train(epochs=epochs, batch_size=batch_size, save_interval=save_interval)
+            self.train(epochs=epochs, batch_size=batch_size, save_interval=save_interval,start_iteration=start_iteration)
         else:
             self.test(batch_size=batch_size)
 
@@ -399,7 +400,8 @@ class BIGAN_ROOT(object):
 if __name__ == '__main__':
     reload_bool = True
     interpolate_bool = False
-    bigan = BIGAN_ROOT(reload_model = reload_bool,interpolate=interpolate_bool)    
+    preload=False
+    bigan = BIGAN_ROOT(reload_model = reload_bool,interpolate=interpolate_bool,preload=preload)    
     bigan.run(epochs=30001, batch_size=32, save_interval=100)
 
 
