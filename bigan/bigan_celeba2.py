@@ -28,7 +28,7 @@ import platform
 print('platform : ', platform.node().lower())
 
 if 'dd144dfd71f8' in platform.node().lower():
-    celeba_path = '/data/users/amp115/skin_analytics/inData/sceleba.npy'
+    celeba_path = '/data/users/amp115/skin_analytics/inData/celeba.npy'
 elif 'alison' in  platform.node().lower():
     celeba_path = '/Users/pouplinalison/Documents/skin_analytics/code_dcgan/inData/celeba.npy'
 elif 'desktop' in  platform.node().lower():
@@ -183,7 +183,7 @@ if __name__ == '__main__':
     reload_bool = False
     interpolate_bool = False
     preload=False
-    start_iteration = 50001
+    start_iteration = 0
     if '-preload' in sys.argv[1:]:
         preload = True
     if '-test' in sys.argv[1:]:
