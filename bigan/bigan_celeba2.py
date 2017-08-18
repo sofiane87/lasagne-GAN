@@ -40,8 +40,8 @@ from bigan_root import BIGAN_ROOT
 
 
 class BIGAN(BIGAN_ROOT):
-    def __init__(self,reload_model = False,interpolate_bool=True,celeba_path=celeba_path,preload=False,start_iteration=0):
-        super(BIGAN, self).__init__(reload_model=reload_model,interpolate_bool=interpolate_bool,
+    def __init__(self,test_model = False,interpolate_bool=True,celeba_path=celeba_path,preload=False,start_iteration=0):
+        super(BIGAN, self).__init__(test_model=test_model,interpolate_bool=interpolate_bool,
                                     img_rows=64,img_cols=64,channels=3, save_folder='bigan/celeba/'
                                     ,latent_dim=200,preload=preload)
         
@@ -191,7 +191,7 @@ if __name__ == '__main__':
     if '-interpolate' in sys.argv[1:]:
         interpolate_bool = True
 
-    bigan = BIGAN(reload_model = reload_bool,interpolate_bool = interpolate_bool,preload=preload,)
+    bigan = BIGAN(test_model = reload_bool,interpolate_bool = interpolate_bool,preload=preload,)
     bigan.run(epochs=50001, batch_size=128, save_interval=100,start_iteration=start_iteration)
 
 

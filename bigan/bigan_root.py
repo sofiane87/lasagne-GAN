@@ -40,7 +40,7 @@ if 'tensorflow' in backend_name.lower():
 class BIGAN_ROOT(object):
     def __init__(self,img_rows=28,img_cols=28,channels=1, optimizer = Adam,
                 optimizer_dis = Adam,  optimizer_dis_params={'beta_1' : 0.5},
-                learningRate=0.00005,optimizer_params = {'beta_1' : 0.5}, reload_model = False,
+                learningRate=0.00005,optimizer_params = {'beta_1' : 0.5}, test_model = False,
                 save_folder='bigan/',interpolate_bool=False,
                 interpolate_params = {'n_intp':10,'idx':None,'save_idx' : True ,'reload_idx':True,'n_steps' : 10},
                 learningRate_dis=0.00005, clip_dis_weight = False,dis_clip_value = 0.2,
@@ -50,8 +50,9 @@ class BIGAN_ROOT(object):
         self.channels = channels
         self.img_shape = (self.img_rows, self.img_cols, self.channels)
         self.latent_dim = latent_dim
-        self.reload = reload_model
-        self.preload = preload or reload_model
+        self.test_bool = test_model
+        self.preload = preload or test_model or interpolate_bool
+        self.train_bool = not(test_model or interpolate_bool)
         self.optimizer_dis_params = optimizer_dis_params
         self.optimizer_params = optimizer_params
         self.optimizer_params['lr'] = learningRate
@@ -159,7 +160,7 @@ class BIGAN_ROOT(object):
         data = self.load_data()
 
         if reload_idx : 
-            idx = self.reload_idx()
+            idx = self.test_bool_idx()
 
         if idx == None:
             idx = []
@@ -317,9 +318,10 @@ class BIGAN_ROOT(object):
         print('done...')
 
     def run(self,epochs=30001, batch_size=32, save_interval=100,start_iteration=0):
-        if not(self.reload) :
+        if self.train_bool :
             self.train(epochs=epochs, batch_size=batch_size, save_interval=save_interval,start_iteration=start_iteration)
-        else:
+
+        if self.test_bool:
             self.test(batch_size=batch_size)
 
         if self.interpolate_bool:
@@ -398,10 +400,11 @@ class BIGAN_ROOT(object):
 
 
 if __name__ == '__main__':
-    reload_bool = False
+    test_bool = False
     interpolate_bool = False
     preload=False
-    bigan = BIGAN_ROOT(reload_model = reload_bool,interpolate=interpolate_bool,preload=preload)    
+    train_bool = True
+    bigan = BIGAN_ROOT(train_bool = train_bool, test_model = test_bool,interpolate=interpolate_bool,preload=preload)    
     bigan.run(epochs=30001, batch_size=32, save_interval=100)
 
 
