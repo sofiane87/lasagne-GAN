@@ -202,7 +202,10 @@ class BIGAN_ROOT(object):
             alpha = alphas[i]
             interpolated_encoding = (1-alpha)*initial_encoded + alpha * final_encoded
             interpolated_image = 0.5 * self.generator.predict(interpolated_encoding) + 0.5
-            axs[i].imshow(interpolated_image.squeeze(), cmap=self.cmap)
+            if self.channels == 1:
+                axs[i].imshow(interpolated_image.squeeze(), cmap=self.cmap)
+            else:
+                axs[i].imshow(interpolated_image.squeeze())
             axs[i].axis('off')
 
         fig.savefig(self.save_intp_folder + "mnist_{}_intp.png".format(index))
