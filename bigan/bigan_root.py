@@ -160,7 +160,7 @@ class BIGAN_ROOT(object):
         data = self.load_data()
 
         if reload_idx : 
-            idx = self.test_bool_idx()
+            idx = self.reload_idx()
 
         if idx == None:
             idx = []
