@@ -403,8 +403,7 @@ if __name__ == '__main__':
     test_bool = False
     interpolate_bool = False
     preload=False
-    train_bool = True
-    bigan = BIGAN_ROOT(train_bool = train_bool, test_model = test_bool,interpolate=interpolate_bool,preload=preload)    
+    bigan = BIGAN_ROOT(test_model = test_bool,interpolate=interpolate_bool,preload=preload)    
     bigan.run(epochs=30001, batch_size=32, save_interval=100)
 
 
