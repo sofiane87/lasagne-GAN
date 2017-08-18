@@ -29,7 +29,7 @@ print('platform : ', platform.node().lower())
 
 is_sofiane = False
 
-elif 'alison' in  platform.node().lower():
+if 'alison' in  platform.node().lower():
     celeba_path = '/Users/pouplinalison/Documents/skin_analytics/code_dcgan/inData/celeba.npy'
 elif 'desktop' in  platform.node().lower():
     is_sofiane = True
@@ -197,8 +197,12 @@ if __name__ == '__main__':
         reload_bool = True
     if '-interpolate' in sys.argv[1:]:
         interpolate_bool = True
+    if '-start' in sys.argv[1:]:
+        start_iteration = int(sys.argv[sys.argv.index('-start')+1])
+        if start_iteration != 0:
+            preload = True
 
-    bigan = BIGAN(reload_model = reload_bool,interpolate_bool = interpolate_bool,preload=preload,)
+    bigan = BIGAN(reload_model = reload_bool,interpolate_bool = interpolate_bool,preload=preload)
     bigan.run(epochs=50001, batch_size=64, save_interval=100,start_iteration=start_iteration)
 
 
