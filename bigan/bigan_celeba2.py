@@ -29,8 +29,8 @@ print('platform : ', platform.node().lower())
 
 if 'dd144dfd71f8' in platform.node().lower():
     celeba_path = '/data/users/amp115/skin_analytics/inData/celeba.npy'
-elif 'alison' in  platform.node().lower():
-    celeba_path = '/Users/pouplinalison/Documents/skin_analytics/code_dcgan/inData/celeba.npy'
+elif 'alison' or 'dyn1196-145.wlan.ic.ac.uk' in  platform.node().lower():
+    celeba_path = '/Users/pouplinalison/Documents/skin_analytics/code_dcgan/inData/sceleba.npy'
 elif 'desktop' in  platform.node().lower():
     celeba_path = 'D:\Code\data\sceleba.npy'
 else:
@@ -40,7 +40,7 @@ from bigan_root import BIGAN_ROOT
 
 
 class BIGAN(BIGAN_ROOT):
-    def __init__(self,reload_model = False,interpolate_bool=False,celeba_path=celeba_path,preload=False,start_iteration=0):
+    def __init__(self,reload_model = False,interpolate_bool=True,celeba_path=celeba_path,preload=False,start_iteration=0):
         super(BIGAN, self).__init__(reload_model=reload_model,interpolate_bool=interpolate_bool,
                                     img_rows=64,img_cols=64,channels=3, save_folder='bigan/celeba/'
                                     ,latent_dim=200,preload=preload)
