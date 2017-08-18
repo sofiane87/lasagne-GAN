@@ -262,7 +262,7 @@ class BIGAN_ROOT(object):
 
             # Select a random half batch of images and encode
             idx = np.random.randint(0, X_train.shape[0], half_batch)
-            imgs = X_train[idx]
+            imgs = X_train[idx].astype('float32')
             z_ = self.encoder.predict(imgs)
 
             valid = np.ones((half_batch, 1)).astype('float32')
@@ -290,7 +290,7 @@ class BIGAN_ROOT(object):
 
             # Select a random half batch of images
             idx = np.random.randint(0, X_train.shape[0], batch_size)
-            imgs = X_train[idx]
+            imgs = X_train[idx].astype('float32')
 
             valid = np.ones((batch_size, 1)).astype('float32')
             fake = np.zeros((batch_size, 1)).astype('float32')
