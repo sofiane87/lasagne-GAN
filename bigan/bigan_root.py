@@ -16,7 +16,7 @@ import platform
 import matplotlib
 # matplotlib.use('TkAgg')
 
-if 'dd144dfd71f8' in platform.node().lower():
+if not ('alison' in platform.node().lower()) or ('desktop' in platform.node().lower()):
     print('backend changed')
     matplotlib.use('Agg')
 
