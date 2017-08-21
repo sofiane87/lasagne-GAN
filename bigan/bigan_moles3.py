@@ -30,23 +30,23 @@ print('platform : ', platform.node().lower())
 is_sofiane = False
 
 if 'alison' in  platform.node().lower():
-    moles_path = '/Users/pouplinalison/Documents/skin_analytics/code_dcgan/inData/celeba.npy'
+    celeba_path = '/Users/pouplinalison/Documents/skin_analytics/code_dcgan/inData/celeba.npy'
 elif 'desktop' in  platform.node().lower():
     is_sofiane = True
-    moles_path = 'D:\Code\data\moles.npy'
+    celeba_path = 'D:\Code\data\moles.npy'
 else:
-    moles_path = '/data/users/amp115/skin_analytics/inData/celeba.npy'
+    celeba_path = '/data/users/amp115/skin_analytics/inData/celeba.npy'
 
 from bigan_root import BIGAN_ROOT
 
 
 class BIGAN(BIGAN_ROOT):
-    def __init__(self,test_model = False,interpolate_bool=False,moles_path=moles_path,preload=False,start_iteration=0):
-        super(BIGAN, self).__init__(test_model=test_model,interpolate_bool=interpolate_bool,
+    def __init__(self,test_model = False,interpolate_bool=False,celeba_path=celeba_path,preload=False,start_iteration=0,train_bool=True):
+        super(BIGAN, self).__init__(train_bool=train_bool, test_model=test_model,interpolate_bool=interpolate_bool,
                                     img_rows=64,img_cols=64,channels=3, save_folder='bigan/moles/'
                                     ,latent_dim=200,preload=preload)
         
-        self.dataPath = moles_path
+        self.dataPath = celeba_path
 
    
 
@@ -187,22 +187,25 @@ class BIGAN(BIGAN_ROOT):
 
 
 if __name__ == '__main__':
-    reload_bool = False
+    test_bool = False
+    train_bool = True
     interpolate_bool = False
     preload=False
     start_iteration = 0
     if '-preload' in sys.argv[1:]:
         preload = True
     if '-test' in sys.argv[1:]:
-        reload_bool = True
+        test_bool = True
+        train_bool = False
     if '-interpolate' in sys.argv[1:]:
-        interpolate_bool = True
+        interpolate_bool = True$
+        train_bool = False
     if '-start' in sys.argv[1:]:
         start_iteration = int(sys.argv[sys.argv.index('-start')+1])
         if start_iteration != 0:
             preload = True
 
-    bigan = BIGAN(test_model = reload_bool,interpolate_bool = interpolate_bool,preload=preload)
+    bigan = BIGAN(train_bool= train_bool, test_model = test_bool,interpolate_bool = interpolate_bool,preload=preload)
     bigan.run(epochs=50001, batch_size=64, save_interval=100,start_iteration=start_iteration)
 
 
