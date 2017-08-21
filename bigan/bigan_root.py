@@ -245,7 +245,7 @@ class BIGAN_ROOT(object):
         fig.show()
 
     def get_batch(self,batch_size=128):
-        if self.batch_index == 0 or self.train_data == None:
+        if self.batch_index == 0 or self.train_data.all() == None:
             self.train_data = self.load_data()
 
         self.batch_index += 1
