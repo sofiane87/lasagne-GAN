@@ -47,7 +47,7 @@ class BIGAN(BIGAN_ROOT):
                                     img_rows=256,img_cols=256,channels=3, save_folder='bigan/moles256/'
                                     ,latent_dim=200,preload=preload)
         
-        self.dataPath = moles_path_list
+        #self.dataPath = moles_path_list
         self.dataIndex = np.zeros([len(moles_path_list)]).astype('int')
         self.batchIndex = 0
    
@@ -197,14 +197,14 @@ class BIGAN(BIGAN_ROOT):
         return Model([z, img], validity)
 
     def load_data(self):
-        for i in range(len(self.dataPath)):
-            npyfiles = [f for f in listdir(dataPath[i]) if '.npy' in f]
+        for i in range(len(self.moles_path_list)):
+            npyfiles = [f for f in listdir(moles_path_list[i]) if '.npy' in f]
             if self.dataIndex[i] == len(npyfiles):
                 self.dataIndex[i] = 0
             if i == 0:
-                data_to_return = np.load(join(dataPath[i],npyfiles[self.dataIndex[i]]))
+                data_to_return = np.load(join(moles_path_list[i],npyfiles[self.dataIndex[i]]))
             else:
-                data_to_return = np.concatenate((data_to_return,np.load(join(dataPath[i],npyfiles[self.dataIndex[i]]))),axis=0)
+                data_to_return = np.concatenate((data_to_return,np.load(join(moles_path_list[i],npyfiles[self.dataIndex[i]]))),axis=0)
             print('Loading data file : {}/9').format(dataIndex[i])
             self.dataIndex[i] += 1
             return data_to_return
