@@ -214,7 +214,7 @@ class BIGAN(BIGAN_ROOT):
             self.train_data = load_data()
         
         while batch_size >= self.train_data.shape[0]:
-            self.train_data = np.concatenate((self.train_data,load_data()),axis=0)
+            self.train_data = np.concatenate((self.train_data,self.load_data()),axis=0)
 
         np.random.shuffle(self.train_data)
 
