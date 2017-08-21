@@ -169,9 +169,9 @@ class BIGAN(BIGAN_ROOT):
         return Model([z, img], validity)
 
     def load_data(self):
-        print('----- Loading CelebA -------')
+        print('----- Loading moles -------')
         X_train = np.load(self.dataPath)
-        print('------ Data Loaded : Preprocessing -----')
+        print('------ Data moles : Preprocessing -----')
         X_train = X_train.transpose([0,2,3,1])
         # Rescale -1 to 1
         if is_sofiane:
@@ -180,8 +180,8 @@ class BIGAN(BIGAN_ROOT):
                 X_train[i] = (X_train[i].astype(np.float32) - 0.5) / 0.5
         else:
             X_train = (X_train.astype(np.float32) - 0.5) / 0.5
-        print('CelebA shape:', X_train.shape, X_train.min(), X_train.max())
-        print('------- CelebA loaded -------')
+        print('moles shape:', X_train.shape, X_train.min(), X_train.max())
+        print('------- moles loaded -------')
         
         return X_train
 
