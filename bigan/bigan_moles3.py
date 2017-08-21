@@ -177,9 +177,9 @@ class BIGAN(BIGAN_ROOT):
         if is_sofiane:
             for i in range(X_train.shape[0]):
                 print('advancement: {:.2f}%'.format(i/X_train.shape[0]*100),end='\r')
-                X_train[i] = (X_train[i].astype(np.float32) - 0.5) / 0.5
+                X_train[i] = (X_train[i].astype(np.float32) - 127.5) / 127.5
         else:
-            X_train = (X_train.astype(np.float32) - 0.5) / 0.5
+            X_train = (X_train.astype(np.float32) - 127.5) / 127.5
         print('moles shape:', X_train.shape, X_train.min(), X_train.max())
         print('------- moles loaded -------')
         
