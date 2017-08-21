@@ -198,7 +198,7 @@ if __name__ == '__main__':
         test_bool = True
         train_bool = False
     if '-interpolate' in sys.argv[1:]:
-        interpolate_bool = True$
+        interpolate_bool = True
         train_bool = False
     if '-start' in sys.argv[1:]:
         start_iteration = int(sys.argv[sys.argv.index('-start')+1])
