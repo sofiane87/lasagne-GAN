@@ -33,11 +33,11 @@ print('platform : ', platform.node().lower())
 
 inPath = '/data/users/amp115/skin_analytics/inData/moles_256/'
 if 'alison' in  platform.node().lower():
-    moles_path_list = [inPath + 'child.npy',inPath + 'skin.npy', inPath + 'isic.npy']
+    moles_path_list = [inPath + 'child/',inPath + 'skin/', inPath + 'isic/']
 elif 'desktop' in  platform.node().lower():
     moles_path_list = ['D:\Code\data/']
 else:
-    moles_path_list = [inPath + 'child.npy',inPath + 'skin.npy', inPath + 'isic.npy']
+    moles_path_list = [inPath + 'child/',inPath + 'skin/', inPath + 'isic/']
 from bigan_root import BIGAN_ROOT
 
 print('data path: ', moles_path_list)
