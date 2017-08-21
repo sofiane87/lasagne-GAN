@@ -251,7 +251,7 @@ class BIGAN_ROOT(object):
         self.batch_index += 1
 
         idx = np.random.randint(0, self.train_data.shape[0], batch_size)
-        batch_imgs = X_train[idx]
+        batch_imgs = self.train_data[idx]
         return batch_imgs
  
     def train(self, epochs, batch_size=128, save_interval=50,start_iteration=0):
