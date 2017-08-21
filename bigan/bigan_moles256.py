@@ -207,7 +207,7 @@ class BIGAN(BIGAN_ROOT):
                 data_to_return = np.load(join(self.dataPath[i],npyfiles[self.dataIndex[i]]))
             else:
                 data_to_return = np.concatenate((data_to_return,np.load(join(self.dataPath[i],npyfiles[self.dataIndex[i]]))),axis=0)
-            print('Loading data file : {}/9').format(dataIndex[i])
+            print('Loading data file : {}/9 in folder #{}'.format(dataIndex[i], i))
             self.dataIndex[i] += 1
             return data_to_return
     
