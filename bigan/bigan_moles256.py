@@ -32,7 +32,7 @@ import platform
 print('platform : ', platform.node().lower())
 
 
-if 'alison' or 'dyn1196-145.wlan.ic.ac.uk' in  platform.node().lower():
+if 'alison' in  platform.node().lower():
     moles_path_list = ['/Users/pouplinalison/Documents/skin_analytics/code_dcgan/inData/moles_256/']
 elif 'desktop' in  platform.node().lower():
     moles_path_list = ['D:\Code\data/']
@@ -42,9 +42,9 @@ from bigan_root import BIGAN_ROOT
 
 
 class BIGAN(BIGAN_ROOT):
-    def __init__(self,test_model = False,interpolate_bool=True,moles_path_list=moles_path_list,preload=False,start_iteration=0):
+    def __init__(self,test_model = False,interpolate_bool=True,moles_path_list=moles_path_list,preload=False,start_iteration=0,train_bool=True):
         super(BIGAN, self).__init__(test_model=test_model,interpolate_bool=interpolate_bool,
-                                    img_rows=64,img_cols=64,channels=3, save_folder='bigan/moles256/'
+                                    img_rows=256,img_cols=256,channels=3, save_folder='bigan/moles256/'
                                     ,latent_dim=200,preload=preload)
         
         self.dataPath = moles_path_list
@@ -229,18 +229,25 @@ class BIGAN(BIGAN_ROOT):
 
 
 if __name__ == '__main__':
-    reload_bool = False
+    test_bool = False
+    train_bool = True
     interpolate_bool = False
     preload=False
     start_iteration = 0
     if '-preload' in sys.argv[1:]:
         preload = True
     if '-test' in sys.argv[1:]:
-        reload_bool = True
+        test_bool = True
+        train_bool = False
     if '-interpolate' in sys.argv[1:]:
         interpolate_bool = True
+        train_bool = False
+    if '-start' in sys.argv[1:]:
+        start_iteration = int(sys.argv[sys.argv.index('-start')+1])
+        if start_iteration != 0:
+            preload = True
 
-    bigan = BIGAN(test_model = reload_bool,interpolate_bool = interpolate_bool,preload=preload,)
+    bigan = BIGAN(train_bool= train_bool, test_model = test_bool,interpolate_bool = interpolate_bool,preload=preload)
     bigan.run(epochs=50001, batch_size=16, save_interval=100,start_iteration=start_iteration)
 
 
