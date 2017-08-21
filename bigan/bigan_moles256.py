@@ -207,9 +207,10 @@ class BIGAN(BIGAN_ROOT):
                 data_to_return = np.load(join(self.dataPath[i],npyfiles[self.dataIndex[i]]))
             else:
                 data_to_return = np.concatenate((data_to_return,np.load(join(self.dataPath[i],npyfiles[self.dataIndex[i]]))),axis=0)
-            print('Loading data file : {}/9 in folder #{}'.format(self.dataIndex[i], i))
+            
+            print('Loading data file : {}/9 in folder #{}/{}'.format(self.dataIndex[i], i,len(self.dataPath)))
             self.dataIndex[i] += 1
-            return data_to_return
+        return data_to_return
     
     def get_batch(self,batch_size=16,update_train = True):
         if self.batchIndex == 0:
