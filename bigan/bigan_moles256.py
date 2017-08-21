@@ -40,6 +40,8 @@ else:
     moles_path_list = [inPath + 'child.npy',inPath + 'skin.npy', inPath + 'isic.npy']
 from bigan_root import BIGAN_ROOT
 
+print('data path: ', moles_path_list)
+
 
 class BIGAN(BIGAN_ROOT):
     def __init__(self,test_model = False,interpolate_bool=True,moles_path_list=moles_path_list,preload=False,start_iteration=0,train_bool=True):
