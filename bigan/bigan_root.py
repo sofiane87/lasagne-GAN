@@ -248,7 +248,6 @@ class BIGAN_ROOT(object):
         if self.batch_index == 0 or self.train_data == None:
             self.train_data = self.load_data()
 
-        print(self.train_data)
         self.batch_index += 1
 
         idx = np.random.randint(0, self.train_data.shape[0], batch_size)

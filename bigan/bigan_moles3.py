@@ -172,7 +172,7 @@ class BIGAN(BIGAN_ROOT):
         print('----- Loading moles -------')
         X_train = np.load(self.dataPath)
         print('------ Data moles : Preprocessing -----')
-        X_train = X_train.transpose([0,2,3,1])
+        # X_train = X_train.transpose([0,2,3,1])
         # Rescale -1 to 1
         if is_sofiane:
             for i in range(X_train.shape[0]):
