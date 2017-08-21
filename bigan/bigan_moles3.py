@@ -30,12 +30,12 @@ print('platform : ', platform.node().lower())
 is_sofiane = False
 
 if 'alison' in  platform.node().lower():
-    celeba_path = '/Users/pouplinalison/Documents/skin_analytics/code_dcgan/inData/celeba.npy'
+    celeba_path = '/Users/pouplinalison/Documents/skin_analytics/code_dcgan/inData/all_moles_64.npy'
 elif 'desktop' in  platform.node().lower():
     is_sofiane = True
     celeba_path = 'D:\Code\data\moles.npy'
 else:
-    celeba_path = '/data/users/amp115/skin_analytics/inData/celeba.npy'
+    celeba_path = '/data/users/amp115/skin_analytics/inData/all_moles_64.npy'
 
 from bigan_root import BIGAN_ROOT
 
