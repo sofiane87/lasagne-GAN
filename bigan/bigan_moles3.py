@@ -187,7 +187,10 @@ class BIGAN(BIGAN_ROOT):
         print('------- moles loaded -------')
         
         return X_train
-
+    
+    def plot(self, fig, img):
+            fig.imshow(img*255)
+            fig.axis('off')
 
 if __name__ == '__main__':
     test_bool = False
