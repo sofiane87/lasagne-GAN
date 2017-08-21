@@ -33,11 +33,11 @@ print('platform : ', platform.node().lower())
 
 inPath = '/data/users/amp115/skin_analytics/inData/moles_256/'
 if 'alison' in  platform.node().lower():
-    moles_path_list = ['child.npy','skin.npy','isic.npy']
+    moles_path_list = [inPath + 'child.npy',inPath + 'skin.npy', inPath + 'isic.npy']
 elif 'desktop' in  platform.node().lower():
     moles_path_list = ['D:\Code\data/']
 else:
-    moles_path_list = ['/data/users/amp115/skin_analytics/inData/moles_256/']
+    moles_path_list = [inPath + 'child.npy',inPath + 'skin.npy', inPath + 'isic.npy']
 from bigan_root import BIGAN_ROOT
 
 
@@ -47,7 +47,7 @@ class BIGAN(BIGAN_ROOT):
                                     img_rows=256,img_cols=256,channels=3, save_folder='bigan/moles256/'
                                     ,latent_dim=200,preload=preload)
         
-        self.dataPath = inPath + moles_path_list
+        self.dataPath = moles_path_list
         self.dataIndex = np.zeros(size=[len(moles_path_list)]).astype('int')
         self.batchIndex = 0
    
