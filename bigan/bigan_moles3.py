@@ -175,6 +175,7 @@ class BIGAN(BIGAN_ROOT):
         # X_train = X_train.transpose([0,2,3,1])
         # Rescale -1 to 1
         if is_sofiane:
+            print('initial max : {} , min : {}'.format(X_train.max() , X_train.min()))
             for i in range(X_train.shape[0]):
                 print('advancement: {:.2f}%'.format(i/X_train.shape[0]*100),end='\r')
                 temp = np.array(X_train[i].astype(np.float32))
