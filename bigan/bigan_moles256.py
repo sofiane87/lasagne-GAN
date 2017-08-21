@@ -33,11 +33,11 @@ print('platform : ', platform.node().lower())
 
 
 if 'alison' or 'dyn1196-145.wlan.ic.ac.uk' in  platform.node().lower():
-    moles_path_list = ['/Users/pouplinalison/Documents/skin_analytics/code_dcgan/inData/sceleba.npy']
+    moles_path_list = ['/Users/pouplinalison/Documents/skin_analytics/code_dcgan/inData/moles_256/']
 elif 'desktop' in  platform.node().lower():
     moles_path_list = ['D:\Code\data/']
 else:
-    moles_path_list = ['/data/users/amp115/skin_analytics/inData/']
+    moles_path_list = ['/data/users/amp115/skin_analytics/inData/moles_256/']
 from bigan_root import BIGAN_ROOT
 
 
