@@ -47,7 +47,7 @@ class BIGAN(BIGAN_ROOT):
                                     img_rows=256,img_cols=256,channels=3, save_folder='bigan/moles256/'
                                     ,latent_dim=200,preload=preload)
         
-        #self.dataPath = moles_path_list
+        self.dataPath = moles_path_list
         self.dataIndex = np.zeros([len(moles_path_list)]).astype('int')
         self.batchIndex = 0
    
