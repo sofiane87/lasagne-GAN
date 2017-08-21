@@ -61,7 +61,7 @@ class BIGAN(BIGAN_ROOT):
         model = Sequential()
 
         model.add(Dense(1024 * 4 * 4, activation="relu", input_shape=noise_shape))
-        model.add(Reshape((4, 4, 512)))
+        model.add(Reshape((4, 4, 1024)))
         model.add(BatchNormalization(momentum=0.8))
         model.add(UpSampling2D())
         model.add(Conv2D(512, kernel_size=3, padding="same"))
