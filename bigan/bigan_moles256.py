@@ -211,7 +211,7 @@ class BIGAN(BIGAN_ROOT):
     
     def get_batch(self,batch_size=16,update_train = True):
         if self.batchIndex == 0:
-            self.train_data = load_data()
+            self.train_data = self.load_data()
         
         while batch_size >= self.train_data.shape[0]:
             self.train_data = np.concatenate((self.train_data,self.load_data()),axis=0)
