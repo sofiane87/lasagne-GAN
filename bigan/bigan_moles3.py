@@ -30,23 +30,23 @@ print('platform : ', platform.node().lower())
 is_sofiane = False
 
 if 'alison' in  platform.node().lower():
-    celeba_path = '/Users/pouplinalison/Documents/skin_analytics/code_dcgan/inData/celeba.npy'
+    moles_path = '/Users/pouplinalison/Documents/skin_analytics/code_dcgan/inData/celeba.npy'
 elif 'desktop' in  platform.node().lower():
     is_sofiane = True
-    celeba_path = 'D:\Code\data\sceleba.npy'
+    moles_path = 'D:\Code\data\moles.npy'
 else:
-    celeba_path = '/data/users/amp115/skin_analytics/inData/celeba.npy'
+    moles_path = '/data/users/amp115/skin_analytics/inData/celeba.npy'
 
 from bigan_root import BIGAN_ROOT
 
 
 class BIGAN(BIGAN_ROOT):
-    def __init__(self,test_model = False,interpolate_bool=False,celeba_path=celeba_path,preload=False,start_iteration=0):
+    def __init__(self,test_model = False,interpolate_bool=False,moles_path=moles_path,preload=False,start_iteration=0):
         super(BIGAN, self).__init__(test_model=test_model,interpolate_bool=interpolate_bool,
-                                    img_rows=64,img_cols=64,channels=3, save_folder='bigan/celeba/'
+                                    img_rows=64,img_cols=64,channels=3, save_folder='bigan/moles/'
                                     ,latent_dim=200,preload=preload)
         
-        self.dataPath = celeba_path
+        self.dataPath = moles_path
 
    
 
