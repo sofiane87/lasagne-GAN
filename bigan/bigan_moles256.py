@@ -48,7 +48,7 @@ class BIGAN(BIGAN_ROOT):
                                     ,latent_dim=200,preload=preload)
         
         self.dataPath = moles_path_list
-        self.dataIndex = np.zeros(size=[len(moles_path_list)]).astype('int')
+        self.dataIndex = np.zeros([len(moles_path_list)]).astype('int')
         self.batchIndex = 0
    
 
