@@ -17,10 +17,6 @@ from time import time
 import sys
 
 
-from os import listdir
-from os.path import isfile, join
-
-
 backend_name = K.backend()
 
 is_tf = False
@@ -31,25 +27,27 @@ if 'tensorflow' in backend_name.lower():
 import platform
 print('platform : ', platform.node().lower())
 
+is_sofiane = False
 
-if 'alison' or 'dyn1196-145.wlan.ic.ac.uk' in  platform.node().lower():
-    moles_path_list = ['/Users/pouplinalison/Documents/skin_analytics/code_dcgan/inData/sceleba.npy']
+if 'alison' in  platform.node().lower():
+    celeba_path = '/Users/pouplinalison/Documents/skin_analytics/code_dcgan/inData/all_moles_128.npy'
 elif 'desktop' in  platform.node().lower():
-    moles_path_list = ['D:\Code\data/']
+    is_sofiane = True
+    celeba_path = 'D:\Code\data\moles.npy'
 else:
-    moles_path_list = ['/data/users/amp115/skin_analytics/inData/']
+    celeba_path = '/data/users/amp115/skin_analytics/inData/all_moles_128.npy'
+
 from bigan_root import BIGAN_ROOT
 
 
 class BIGAN(BIGAN_ROOT):
-    def __init__(self,test_model = False,interpolate_bool=True,moles_path_list=moles_path_list,preload=False,start_iteration=0):
-        super(BIGAN, self).__init__(test_model=test_model,interpolate_bool=interpolate_bool,
-                                    img_rows=64,img_cols=64,channels=3, save_folder='bigan/celeba/'
+    def __init__(self,test_model = False,interpolate_bool=False,celeba_path=celeba_path,preload=False,start_iteration=0,train_bool=True):
+        super(BIGAN, self).__init__(train_bool=train_bool, test_model=test_model,interpolate_bool=interpolate_bool,
+                                    img_rows=128,img_cols=128,channels=3, save_folder='bigan/moles128/'
                                     ,latent_dim=200,preload=preload)
         
-        self.dataPath = moles_path_list
-        self.dataIndex = np.zeros(size=[len(moles_path_list)]).astype('int')
-        self.batchIndex = 0
+        self.dataPath = celeba_path
+
    
 
 
@@ -60,8 +58,12 @@ class BIGAN(BIGAN_ROOT):
         
         model = Sequential()
 
-        model.add(Dense(512 * 4 * 4, activation="relu", input_shape=noise_shape))
-        model.add(Reshape((4, 4, 512)))
+        model.add(Dense(1024 * 4 * 4, activation="relu", input_shape=noise_shape))
+        model.add(Reshape((4, 4, 1024)))
+        model.add(BatchNormalization(momentum=0.8))
+        model.add(UpSampling2D())
+        model.add(Conv2D(512, kernel_size=3, padding="same"))
+        model.add(Activation("relu"))
         model.add(BatchNormalization(momentum=0.8))
         model.add(UpSampling2D())
         model.add(Conv2D(256, kernel_size=3, padding="same"))
@@ -95,11 +97,15 @@ class BIGAN(BIGAN_ROOT):
         
         model = Sequential()
 
-        model.add(Conv2D(32, kernel_size=3, strides=2, input_shape=img_shape, padding="same"))
+        model.add(Conv2D(16, kernel_size=3, strides=2, input_shape=img_shape, padding="same"))
         model.add(LeakyReLU(alpha=0.2))
         model.add(Dropout(0.25))
-        model.add(Conv2D(64, kernel_size=3, strides=2, padding="same"))
+        model.add(Conv2D(32, kernel_size=3, strides=2, padding="same"))
         model.add(ZeroPadding2D(padding=((0,1),(0,1))))
+        model.add(LeakyReLU(alpha=0.2))
+        model.add(Dropout(0.25))
+        model.add(BatchNormalization(momentum=0.8))
+        model.add(Conv2D(64, kernel_size=3, strides=2, padding="same"))
         model.add(LeakyReLU(alpha=0.2))
         model.add(Dropout(0.25))
         model.add(BatchNormalization(momentum=0.8))
@@ -126,9 +132,14 @@ class BIGAN(BIGAN_ROOT):
         img_shape = (self.img_rows, self.img_cols, self.channels)
         img = Input(shape=img_shape)
 
-        model_image = Conv2D(32, kernel_size=3, strides=2, padding="same")(img)
+        model_image = Conv2D(16, kernel_size=3, strides=2, padding="same")(img)
         model_image = LeakyReLU(alpha=0.2)(model_image)
         model_image = Dropout(0.25)(model_image)
+        model_image = Conv2D(32, kernel_size=3, strides=2, padding="same")(model_image)
+        model_image = ZeroPadding2D(padding=((0,1),(0,1)))(model_image)
+        model_image = LeakyReLU(alpha=0.2)(model_image)
+        model_image = Dropout(0.25)(model_image)
+        model_image = BatchNormalization(momentum=0.8)(model_image)
         model_image = Conv2D(64, kernel_size=3, strides=2, padding="same")(model_image)
         model_image = ZeroPadding2D(padding=((0,1),(0,1)))(model_image)
         model_image = LeakyReLU(alpha=0.2)(model_image)
@@ -171,51 +182,51 @@ class BIGAN(BIGAN_ROOT):
         return Model([z, img], validity)
 
     def load_data(self):
-        for i in range(len(self.moles_path_list)):
-            npyfiles = [f for f in listdir(moles_path_list[i]) if '.npy' in f]
-            if self.dataIndex[i] == len(npyfiles):
-                self.dataIndex[i] = 0
-            if i == 0:
-                data_to_return = np.load(join(moles_path_list[i],npyfiles[self.dataIndex[i]]))
-            else:
-                data_to_return = np.concatenate((data_to_return,np.load(join(moles_path_list[i],npyfiles[self.dataIndex[i]]))),axis=0)
-
-            self.dataIndex[i] += 1
-            return data_to_return
-    
-    def get_batch(self,batch_size=128,update_train = True):
-        if self.batchIndex == 0:
-            self.train_data = load_data()
+        print('----- Loading moles -------')
+        X_train = np.load(self.dataPath)
+        print('------ Data moles : Preprocessing -----')
+        # X_train = X_train.transpose([0,2,3,1])
+        # Rescale -1 to 1
+        if is_sofiane:
+            print('initial max : {} , min : {}'.format(X_train.max() , X_train.min()))
+            for i in range(X_train.shape[0]):
+                print('advancement: {:.2f}%'.format(i/X_train.shape[0]*100),end='\r')
+                temp = np.array(X_train[i].astype(np.float32))
+                # temp[:,:,1] =  X_train[i,:,:,0]
+                # temp[:,:,0] = X_train[i,:,:,1]
+                X_train[i] = (temp - 127.5) / 127.5
+        else:
+            X_train = (X_train.astype(np.float32) - 127.5) / 127.5
+        print('moles shape:', X_train.shape, X_train.min(), X_train.max())
+        print('------- moles loaded -------')
         
-        while batch_size >= self.train_data.shape[0]:
-            self.train_data = np.concatenate((self.train_data,load_data()),axis=0)
-
-        np.random.shuffle(self.train_data)
-
-        batch = self.train_data[:batch_size]
-        if update_train:
-            self.train_data = self.train_data[batch_size:]
-        self.batchIndex += 1
-
-        return batch
-
-
-
+        return X_train
+    
+    def plot(self, fig, img):
+            fig.imshow(np.array(img*255).astype(np.uint8))
+            fig.axis('off')
 
 if __name__ == '__main__':
-    reload_bool = False
+    test_bool = False
+    train_bool = True
     interpolate_bool = False
     preload=False
     start_iteration = 0
     if '-preload' in sys.argv[1:]:
         preload = True
     if '-test' in sys.argv[1:]:
-        reload_bool = True
+        test_bool = True
+        train_bool = False
     if '-interpolate' in sys.argv[1:]:
         interpolate_bool = True
+        train_bool = False
+    if '-start' in sys.argv[1:]:
+        start_iteration = int(sys.argv[sys.argv.index('-start')+1])
+        if start_iteration != 0:
+            preload = True
 
-    bigan = BIGAN(test_model = reload_bool,interpolate_bool = interpolate_bool,preload=preload,)
-    bigan.run(epochs=50001, batch_size=128, save_interval=100,start_iteration=start_iteration)
+    bigan = BIGAN(train_bool= train_bool, test_model = test_bool,interpolate_bool = interpolate_bool,preload=preload)
+    bigan.run(epochs=50001, batch_size=64, save_interval=100,start_iteration=start_iteration)
 
 
 
