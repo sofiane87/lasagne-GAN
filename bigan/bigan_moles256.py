@@ -250,7 +250,7 @@ if __name__ == '__main__':
             preload = True
 
     bigan = BIGAN(train_bool= train_bool, test_model = test_bool,interpolate_bool = interpolate_bool,preload=preload)
-    bigan.run(epochs=50001, batch_size=16, save_interval=100,start_iteration=start_iteration)
+    bigan.run(epochs=50001, batch_size=32, save_interval=100,start_iteration=start_iteration)
 
 
 
