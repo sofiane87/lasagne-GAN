@@ -40,9 +40,9 @@ if 'tensorflow' in backend_name.lower():
 class BIGAN_ROOT(object):
     def __init__(self,img_rows=28,img_cols=28,channels=1, optimizer = Adam,
                 optimizer_dis = Adam,  optimizer_dis_params={'beta_1' : 0.5},
-                learningRate=0.00005,optimizer_params = {'beta_1' : 0.5}, test_model = False,
-                save_folder='bigan/',interpolate_bool=False,
-                interpolate_params = {'n_intp':10,'idx':None,'save_idx' : True ,'reload_idx':True,'n_steps' : 10},
+                learningRate=0.00005,optimizer_params = {'beta_1' : 0.5}, reload_model = False,
+                save_folder='bigan/',interpolate_bool=True,
+                interpolate_params = {'n_intp':10,'idx':None,'save_intp_input' : True ,'reload_idx':True,'n_steps' : 10},
                 learningRate_dis=0.00005, clip_dis_weight = False,dis_clip_value = 0.2,
                 latent_dim = 100,preload=False):
         self.img_rows =  img_rows 
@@ -50,9 +50,8 @@ class BIGAN_ROOT(object):
         self.channels = channels
         self.img_shape = (self.img_rows, self.img_cols, self.channels)
         self.latent_dim = latent_dim
-        self.test_bool = test_model
-        self.preload = preload or test_model or interpolate_bool
-        self.train_bool = not(test_model or interpolate_bool)
+        self.reload = reload_model
+        self.preload = preload or reload_model
         self.optimizer_dis_params = optimizer_dis_params
         self.optimizer_params = optimizer_params
         self.optimizer_params['lr'] = learningRate
@@ -62,11 +61,13 @@ class BIGAN_ROOT(object):
         self.optimizer = optimizer(**self.optimizer_params)
         self.save_model_folder = save_folder + 'saved_model/'
         self.save_img_folder = save_folder + 'images/'
-        self.save_idx_folder = save_folder + 'idx/'
+        self.save_intp_input_folder = save_folder + 'intp_input/'
         self.save_intp_folder = save_folder + 'intp/'
         self.interpolate_bool = interpolate_bool
         self.interpolate_params = interpolate_params
-        
+        self.batch_index = 0
+        self.train_data = None
+
         self.clip_dis_weight = clip_dis_weight
         self.dis_clip_value = dis_clip_value
         if self.channels == 1:
@@ -155,36 +156,35 @@ class BIGAN_ROOT(object):
 
 
 
-    def run_interpolation(self,n_intp=10,idx=None,save_idx = True,reload_idx=True,n_steps = 10):
+    def run_interpolation(self,n_intp=10,idx=None,save_intp_input = True,reload_imgs=True,n_steps = 10):
         
-        data = self.load_data()
 
-        if reload_idx : 
-            idx = self.reload_idx()
-
-        if idx == None:
-            idx = []
-
+        input_images = np.zeros(shape=[2*n_intp,self.img_rows,self.img_cols,self.channels])
         index = 0
-        while len(idx)<2*n_intp and index < data.shape[0]:
-            if index not in idx:
-                sample = data[index:index+1]
-                decoded_sample = self.encode_decode(sample)
-                self.display_pair(sample,decoded_sample)
-                decision = raw_input("should we keep this image ?\n").lower()
-                if 'y' in decision:
-                    idx.append(index)
-                    print('index {} added to the list'.format(index))
-                    print('remaining : {}'.format(n_intp*2 - len(idx)))
+
+        if reload_imgs : 
+            images_loaded = self.reload_idx()
+            index = min(images_loaded.shape[0],input_images.shape[0])
+            input_images[:index] = images_loaded
+
+
+        while index<2*n_intp:
+            sample = self.get_batch(1)
+            decoded_sample = self.encode_decode(sample)
+            self.display_pair(sample,decoded_sample)
+            decision = raw_input("should we keep this image ?\n").lower()
+            if 'y' in decision:
+                input_images[index] = sample.squeeze()
+                index += 1
+                print('index {} added to the list'.format(index))
+                print('remaining : {}'.format(n_intp*2 - index))
                 plt.close()
 
-            index += 1
+        if save_intp_input:
+            self.save_intp_input(input_images)
 
-        if save_idx:
-            self.save_idx(idx)
-
-        for i in range(max(n_intp,np.floor(len(idx)/2))):
-            self.interpolate(initial = data[2*i:2*i+1],final = data[2*i+1:2*i+2],index = i,n_steps = n_steps)
+        for i in range(index):
+            self.interpolate(initial = input_images[2*i:2*i+1],final = input_images[2*i+1:2*i+2],index = i,n_steps = n_steps)
 
 
     def interpolate(self,initial,final,index,n_steps=10):
@@ -202,28 +202,25 @@ class BIGAN_ROOT(object):
             alpha = alphas[i]
             interpolated_encoding = (1-alpha)*initial_encoded + alpha * final_encoded
             interpolated_image = 0.5 * self.generator.predict(interpolated_encoding) + 0.5
-            if self.channels == 1:
-                axs[i].imshow(interpolated_image.squeeze(), cmap=self.cmap)
-            else:
-                axs[i].imshow(interpolated_image.squeeze())
+            axs[i].imshow(interpolated_image.squeeze(), cmap=self.cmap)
             axs[i].axis('off')
 
-        fig.savefig(self.save_intp_folder + "mnist_{}_intp.png".format(index))
+        fig.savefig(self.save_intp_folder + "{}_intp.png".format(index))
         plt.close()
 
 
-    def reload_idx(self):
-        if os.path.exists(self.save_idx_folder + 'idx.npy'):
-            idx = np.load(self.save_idx_folder + 'idx.npy').tolist()
+    def reload_intp_images(self):
+        if os.path.exists(self.save_intp_input_folder + 'intp_images.npy'):
+            idx = np.load(self.save_intp_input_folder + 'intp_images.npy').tolist()
         else:
             idx = []
         return idx
 
-    def save_idx(self,idx):
-        if not(os.path.exists(self.save_idx_folder)):
-            os.makedirs(self.save_idx_folder)
+    def save_intp_input(self,intp_input):
+        if not(os.path.exists(self.save_intp_input_folder)):
+            os.makedirs(self.save_intp_input_folder)
 
-        np.save(self.save_idx_folder + 'idx',idx)
+        np.save(self.save_intp_input_folder + 'intp_images',intp_input)
 
 
     def encode_decode(self,img):
@@ -246,10 +243,19 @@ class BIGAN_ROOT(object):
         windowmanager.window.wm_geometry("+0+0")
         fig.show()
 
+    def get_batch(self,batch_size=128):
+        if self.batch_index == 0 or self.train_data == None:
+            self.train_data = self.load_data()
+
+        self.batch_index += 1
+
+        idx = np.random.randint(0, self.train_data.shape[0], batch_size)
+        batch_imgs = X_train[idx]
+        return batch_imgs
+ 
     def train(self, epochs, batch_size=128, save_interval=50,start_iteration=0):
 
 
-        X_train = self.load_data()
 
         half_batch = int(batch_size / 2)
 
@@ -265,8 +271,9 @@ class BIGAN_ROOT(object):
             imgs_ = self.generator.predict(z)
 
             # Select a random half batch of images and encode
-            idx = np.random.randint(0, X_train.shape[0], half_batch)
-            imgs = X_train[idx].astype('float32')
+            # idx = np.random.randint(0, X_train.shape[0], half_batch)
+            # imgs = X_train[idx]
+            imgs = self.get_batch(batch_size = half_batch)
             z_ = self.encoder.predict(imgs)
 
             valid = np.ones((half_batch, 1)).astype('float32')
@@ -293,8 +300,10 @@ class BIGAN_ROOT(object):
             z = np.random.normal(size=(batch_size, self.latent_dim)).astype('float32')
 
             # Select a random half batch of images
-            idx = np.random.randint(0, X_train.shape[0], batch_size)
-            imgs = X_train[idx].astype('float32')
+            # idx = np.random.randint(0, X_train.shape[0], batch_size)
+            # imgs = X_train[idx]
+
+            imgs = self.get_batch(batch_size=batch_size)
 
             valid = np.ones((batch_size, 1)).astype('float32')
             fake = np.zeros((batch_size, 1)).astype('float32')
@@ -314,17 +323,14 @@ class BIGAN_ROOT(object):
 
     def test(self,batch_size=128):
         print('testing ...')
-        X_train = self.load_data()
-        idx = np.random.randint(0, X_train.shape[0], batch_size)
-        imgs = X_train[idx]
+        imgs = self.get_batch(batch_size)
         self.save_imgs('test',imgs)
         print('done...')
 
     def run(self,epochs=30001, batch_size=32, save_interval=100,start_iteration=0):
-        if self.train_bool :
+        if not(self.reload) :
             self.train(epochs=epochs, batch_size=batch_size, save_interval=save_interval,start_iteration=start_iteration)
-
-        if self.test_bool:
+        else:
             self.test(batch_size=batch_size)
 
         if self.interpolate_bool:
@@ -403,10 +409,10 @@ class BIGAN_ROOT(object):
 
 
 if __name__ == '__main__':
-    test_bool = False
+    reload_bool = False
     interpolate_bool = False
     preload=False
-    bigan = BIGAN_ROOT(test_model = test_bool,interpolate=interpolate_bool,preload=preload)    
+    bigan = BIGAN_ROOT(reload_model = reload_bool,interpolate=interpolate_bool,preload=preload)    
     bigan.run(epochs=30001, batch_size=32, save_interval=100)
 
 
