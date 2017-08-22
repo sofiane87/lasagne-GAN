@@ -346,6 +346,17 @@ class BIGAN_ROOT(object):
             self.run_interpolation(**self.interpolate_params)
             print('interpolation done !')
 
+    def montage(self, image):
+        montage=[]
+        self.rows = 5
+        self.cols = 5
+        for i in range(rows):
+            col = image[i*cols:(i+1)*cols]
+            col = np.hstack(col)
+            montage.append(col)
+        montage = np.vstack(montage)
+        return montage
+
     def save_imgs(self, epoch,imgs):
         if not(os.path.exists(self.save_img_folder)):
             os.makedirs(self.save_img_folder)
@@ -359,48 +370,62 @@ class BIGAN_ROOT(object):
         gen_enc_imgs = self.generator.predict(z_imgs)
         gen_enc_imgs = 0.5 * gen_enc_imgs + 0.5
 
-        fig, axs = plt.subplots(r, c)
-        cnt = 0
-        for i in range(r):
-            for j in range(c):
-                self.plot(axs[i,j],gen_imgs[cnt, :,:,:].squeeze())
-                cnt += 1
-        
-        print('----- Saving generated -----')
-        if isinstance(epoch, str):
-            fig.savefig(self.save_img_folder + "{}_gen.png".format(epoch))
-        else:
-            fig.savefig(self.save_img_folder + "%d_gen.png" % epoch)
-        plt.close()
-
-
-        fig, axs = plt.subplots(r, c)
-        cnt = 0
-        for i in range(r):
-            for j in range(c):
-                self.plot(axs[i,j],gen_enc_imgs[cnt, :,:,:].squeeze())
-                cnt += 1
-        print('----- Saving encoded -----')
-        if isinstance(epoch, str):
-            fig.savefig(self.save_img_folder + "{}_enc.png".format(epoch))
-        else : 
-            fig.savefig(self.save_img_folder + "%d_enc.png" % epoch)
-        plt.close()
-
-        fig, axs = plt.subplots(r, c)
-        cnt = 0
         imgs = imgs * 0.5 + 0.5
-        for i in range(r):
-            for j in range(c):
-                self.plot(axs[i,j],imgs[cnt, :,:,:].squeeze())
-                cnt += 1
+
+
+        real_montage = self.montage(1-imgs)
+        imsave(self.save_img_folder + '{}_0real.png'.format(epoch),real_montage)
+        print('-- Saving real --')
+
+        gen_montage = self.montage(1-gen_imgs)
+        imsave(self.save_img_folder + '{}_2gen.png'.format(epoch),gen_montage)
+        print('-- Saving generated --')
+
+        enc_montage = self.montage(1-gen_enc_imgs)
+        imsave(self.save_img_folder + '{}_1enc.png'.format(epoch),enc_montage)
+        print('-- Saving encoded --')
+
+        # fig, axs = plt.subplots(r, c)
+        # cnt = 0
+        # for i in range(r):
+        #     for j in range(c):
+        #         self.plot(axs[i,j],gen_imgs[cnt, :,:,:].squeeze())
+        #         cnt += 1
         
-        print('----- Saving real -----')
-        if isinstance(epoch, str):
-            fig.savefig(self.save_img_folder + "{}_real.png".format(epoch))
-        else : 
-            fig.savefig(self.save_img_folder + "%d_real.png" % epoch)
-        plt.close()
+        # print('----- Saving generated -----')
+        # if isinstance(epoch, str):
+        #     fig.savefig(self.save_img_folder + "{}_gen.png".format(epoch))
+        # else:
+        #     fig.savefig(self.save_img_folder + "%d_gen.png" % epoch)
+        # plt.close()
+
+
+        # fig, axs = plt.subplots(r, c)
+        # cnt = 0
+        # for i in range(r):
+        #     for j in range(c):
+        #         self.plot(axs[i,j],gen_enc_imgs[cnt, :,:,:].squeeze())
+        #         cnt += 1
+        # print('----- Saving encoded -----')
+        # if isinstance(epoch, str):
+        #     fig.savefig(self.save_img_folder + "{}_enc.png".format(epoch))
+        # else : 
+        #     fig.savefig(self.save_img_folder + "%d_enc.png" % epoch)
+        # plt.close()
+
+        # fig, axs = plt.subplots(r, c)
+        # cnt = 0
+        # for i in range(r):
+        #     for j in range(c):
+        #         self.plot(axs[i,j],imgs[cnt, :,:,:].squeeze())
+        #         cnt += 1
+        
+        # print('----- Saving real -----')
+        # if isinstance(epoch, str):
+        #     fig.savefig(self.save_img_folder + "{}_real.png".format(epoch))
+        # else : 
+        #     fig.savefig(self.save_img_folder + "%d_real.png" % epoch)
+        # plt.close()
 
 
     def plot(self, fig, img):
