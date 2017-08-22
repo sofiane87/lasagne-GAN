@@ -404,12 +404,13 @@ class BIGAN_ROOT(object):
 
 
     def plot(self, fig, img):
-        if self.channels == 1:
-            fig.imshow(img,cmap=self.cmap)
-            fig.axis('off')
-        else:
-            fig.imshow(img)
-            fig.axis('off')
+        raise NotImplementedError
+        # if self.channels == 1:
+        #     fig.imshow(img,cmap=self.cmap)
+        #     fig.axis('off')
+        # else:
+        #     fig.imshow(img)
+        #     fig.axis('off')
 
 
 
