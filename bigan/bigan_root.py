@@ -14,6 +14,7 @@ from keras.utils import to_categorical
 import keras.backend as K
 import platform
 import matplotlib
+from skimage.io import imsave
 # matplotlib.use('TkAgg')
 
 if not ('alison' in platform.node().lower()) or ('desktop' in platform.node().lower()):
