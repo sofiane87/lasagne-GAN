@@ -169,6 +169,9 @@ class BIGAN(BIGAN_ROOT):
         model = Dense(512)(d_in)
         model = LeakyReLU(alpha=0.2)(model)
         model = Dropout(0.5)(model)
+        model = Dense(512)(d_in)
+        model = LeakyReLU(alpha=0.2)(model)
+        model = Dropout(0.5)(model)
         
         # model = Dense(1024)(model)
         # model = LeakyReLU(alpha=0.2)(model)
