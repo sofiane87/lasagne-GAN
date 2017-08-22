@@ -190,7 +190,7 @@ class BIGAN(BIGAN_ROOT):
         return X_train
     
     def plot(self, fig, img):
-            fig.imshow(np.array(img*255).astype(np.uint8))
+            fig.imshow(np.array(img*255).floor())
             fig.axis('off')
 
 if __name__ == '__main__':
