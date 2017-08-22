@@ -349,8 +349,8 @@ class BIGAN_ROOT(object):
 
     def montage(self, image):
         montage=[]
-        self.rows = 5
-        self.cols = 5
+        rows = 5
+        cols = 5
         for i in range(rows):
             col = image[i*cols:(i+1)*cols]
             col = np.hstack(col)
