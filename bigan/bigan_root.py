@@ -267,30 +267,30 @@ class BIGAN_ROOT(object):
             # ---------------------
             #  Train Discriminator
             # ---------------------
+            for k in range(1):
+                # Sample noise and generate img
+                z = np.random.normal(size=(half_batch, self.latent_dim)).astype('float32')
+                imgs_ = self.generator.predict(z)
 
-            # Sample noise and generate img
-            z = np.random.normal(size=(half_batch, self.latent_dim)).astype('float32')
-            imgs_ = self.generator.predict(z)
+                # Select a random half batch of images and encode
+                # idx = np.random.randint(0, X_train.shape[0], half_batch)
+                # imgs = X_train[idx]
+                imgs = self.get_batch(batch_size = half_batch)
+                z_ = self.encoder.predict(imgs)
 
-            # Select a random half batch of images and encode
-            # idx = np.random.randint(0, X_train.shape[0], half_batch)
-            # imgs = X_train[idx]
-            imgs = self.get_batch(batch_size = half_batch)
-            z_ = self.encoder.predict(imgs)
+                valid = np.ones((half_batch, 1)).astype('float32')
+                fake = np.zeros((half_batch, 1)).astype('float32')
 
-            valid = np.ones((half_batch, 1)).astype('float32')
-            fake = np.zeros((half_batch, 1)).astype('float32')
+                # Train the discriminator (img -> z is valid, z -> img is fake)
+                d_loss_real = self.discriminator.train_on_batch([z_, imgs], valid)
+                d_loss_fake = self.discriminator.train_on_batch([z, imgs_], fake)
+                d_loss = 0.5 * np.add(d_loss_real, d_loss_fake)
 
-            # Train the discriminator (img -> z is valid, z -> img is fake)
-            d_loss_real = self.discriminator.train_on_batch([z_, imgs], valid)
-            d_loss_fake = self.discriminator.train_on_batch([z, imgs_], fake)
-            d_loss = 0.5 * np.add(d_loss_real, d_loss_fake)
-
-            # if self.clip_dis_weight :
-            #     for l in self.discriminator.layers:
-            #         weights = l.get_weights()
-            #         weights = [np.clip(w, -self.dis_clip_value, self.dis_clip_value) for w in weights]
-            #         l.set_weights(weights)
+                # if self.clip_dis_weight :
+                #     for l in self.discriminator.layers:
+                #         weights = l.get_weights()
+                #         weights = [np.clip(w, -self.dis_clip_value, self.dis_clip_value) for w in weights]
+                #         l.set_weights(weights)
 
 
 
