@@ -314,11 +314,9 @@ class BIGAN():
 
     def load_data(self):
         print('---- loading MNIST -----')
-        (X_train, _), (_, _) = mnist.load_data()
-        # Rescale -1 to 1
-        X_train = (X_train.astype(np.float32) - 127.5) / 127.5
-        X_train = np.expand_dims(X_train, axis=3)
+        X_train = np.load('/data/users/amp115/skin_analytics/inData/mnist.npy')
         print('----- MNIST loaded ------')
+        print x_train.shape, X_train.min(), X_train.max()
         return X_train
 
     def model_save(self):
@@ -336,7 +334,7 @@ class BIGAN():
     def train(self, epochs, batch_size=128, save_interval=50):
 
         # Load the dataset
-        (X_train, _), (_, _) = mnist.load_data()
+        X_train = self.load_data()
 
         # Rescale -1 to 1
         X_train = (X_train.astype(np.float32) - 127.5) / 127.5
@@ -394,9 +392,22 @@ class BIGAN():
                 # Select a random half batch of images
                 self.save_imgs(epoch,imgs)
                 self.model_save()
+    def montage(self, image):
+        montage=[]
+        rows = 10
+        cols = 10
+        for i in range(rows):
+            col = image[i*cols:(i+1)*cols]
+            col = np.hstack(col)
+            montage.append(col)
+        montage = np.vstack(montage)
+        return montage
+
     def save_imgs(self, epoch,imgs):
-        r, c = 5, 5
-        z = np.random.normal(size=(25, self.latent_dim))
+        if not(os.path.exists(self.save_img_folder)):
+            os.makedirs(self.save_img_folder)
+
+        z = np.random.normal(size=(100, self.latent_dim))
         gen_imgs = self.generator.predict(z)
         gen_imgs = 0.5 * gen_imgs + 0.5
 
@@ -404,41 +415,29 @@ class BIGAN():
         gen_enc_imgs = self.generator.predict(z_imgs)
         gen_enc_imgs = 0.5 * gen_enc_imgs + 0.5
 
-        fig, axs = plt.subplots(r, c)
-        cnt = 0
-        for i in range(r):
-            for j in range(c):
-                axs[i,j].imshow(gen_imgs[cnt, :,:,0], cmap='gray')
-                axs[i,j].axis('off')
-                cnt += 1
-        
-        print('----- Saving generated -----')
-        fig.savefig("bigan/images/mnist_%d.png" % epoch)
-        plt.close()
+        imgs = imgs * 0.5 + 0.5
 
 
-        fig, axs = plt.subplots(r, c)
-        cnt = 0
-        for i in range(r):
-            for j in range(c):
-                axs[i,j].imshow(gen_enc_imgs[cnt, :,:,0], cmap='gray')
-                axs[i,j].axis('off')
-                cnt += 1
-        print('----- Saving encoded -----')
-        fig.savefig("bigan/images/mnist_%d_enc.png" % epoch)
-        plt.close()
+        real_montage = self.montage(imgs)
+        imsave(self.save_img_folder + '{}_0real.png'.format(epoch),real_montage)
+        print('-- Saving real --')
 
-        fig, axs = plt.subplots(r, c)
-        cnt = 0
-        for i in range(r):
-            for j in range(c):
-                axs[i,j].imshow(imgs[cnt, :,:,0], cmap='gray')
-                axs[i,j].axis('off')
-                cnt += 1
-        
-        print('----- Saving real -----')
-        fig.savefig("bigan/images/mnist_%d_real.png" % epoch)
-        plt.close()
+        gen_montage = self.montage(gen_imgs)
+        imsave(self.save_img_folder + '{}_2gen.png'.format(epoch),gen_montage)
+        print('-- Saving generated --')
+
+        enc_montage = self.montage(gen_enc_imgs)
+        imsave(self.save_img_folder + '{}_1enc.png'.format(epoch),enc_montage)
+        print('-- Saving encoded --')
+
+        self.train_data = self.load_data()
+        trueImgs = self.train_data[0:99]
+        img_enc = encode_decode(trueImgs)
+
+        enc_dec_montage = self.montage(img_enc)
+        imsave(self.save_img_folder + '{}_3encDec.png'.format(epoch),enc_dec_montage)
+        print('-- Saving enc/dec --')
+
 
 if __name__ == '__main__':
     reload_bool = False
