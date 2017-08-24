@@ -26,8 +26,8 @@ if 'tensorflow' in backend_name.lower():
 from bigan_root import BIGAN_ROOT
 
 class BIGAN(BIGAN_ROOT):
-    def __init__(self,reload_model = False,interpolate_bool=False):
-        super(BIGAN, self).__init__(reload_model=reload_model,interpolate_bool=interpolate_bool)
+    def __init__(self,interpolate_bool=False):
+        super(BIGAN, self).__init__(interpolate_bool=interpolate_bool)
 
     def build_encoder(self):
         img_shape = (self.img_rows, self.img_cols, self.channels)
