@@ -314,7 +314,7 @@ class BIGAN():
 
     def load_data(self):
         print('---- loading MNIST -----')
-        X_train = np.load('../../inData/mnist.npy')
+        X_train = np.load('/data/users/amp115/skin_analytics/inData/mnist.npy')
         print('----- MNIST loaded ------')
         print (x_train.shape, X_train.min(), X_train.max())
         return X_train
