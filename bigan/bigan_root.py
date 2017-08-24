@@ -433,7 +433,6 @@ class BIGAN_ROOT(object):
         # else : 
         #     fig.savefig(self.save_img_folder + "%d_real.png" % epoch)
         # plt.close()
-    def showTraining(self,):
 
 
     def plot(self, fig, img):
