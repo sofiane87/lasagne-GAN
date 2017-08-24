@@ -29,6 +29,9 @@ class BIGAN():
         self.latent_dim = 100
         self.reload = reload_model
         optimizer = Adam(0.0002, 0.5)
+        save_folder = 'mnist_test/'
+        self.save_model_folder = save_folder + 'saved_model/'
+        self.save_img_folder = save_folder + 'images/'
 
 
 
@@ -396,6 +399,8 @@ class BIGAN():
                 self.model_save()
     def montage(self, image):
         montage=[]
+        image = image.squeeze()
+        print(image.shape)
         rows = 10
         cols = 10
         for i in range(rows):
@@ -445,7 +450,7 @@ if __name__ == '__main__':
     reload_bool = False
     bigan = BIGAN(reload_model = reload_bool)
     if not(reload_bool):
-        bigan.train(epochs=40000, batch_size=32, save_interval=400)
+        bigan.train(epochs=40000, batch_size=128, save_interval=400)
 
 
 
