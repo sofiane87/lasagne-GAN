@@ -17,7 +17,7 @@ import matplotlib
 from skimage.io import imsave
 # matplotlib.use('TkAgg')
 
-if not ('alison' in platform.node().lower()) or ('desktop' in platform.node().lower()):
+if not (('alison' in platform.node().lower()) or ('desktop' in platform.node().lower()) or ('sofiane' in platform.node().lower())):
     print('backend changed')
     matplotlib.use('Agg')
 
@@ -30,6 +30,9 @@ import numpy as np
 from time import time
 import os
 
+import sys
+if sys.version_info >= (3, 0):
+    raw_input = input
 
 backend_name = K.backend()
 
@@ -39,7 +42,7 @@ if 'tensorflow' in backend_name.lower():
 
 
 class BIGAN_ROOT(object):
-    def __init__(self,img_rows=28,img_cols=28,channels=1, optimizer = Adam,
+    def __init__(self,example_bool = False, img_rows=28,img_cols=28,channels=1, optimizer = Adam,
                 optimizer_dis = Adam,  optimizer_dis_params={'beta_1' : 0.5},
                 learningRate=0.00005,optimizer_params = {'beta_1' : 0.5}, test_model = False,
                 save_folder='bigan/',interpolate_bool=True,
@@ -69,6 +72,8 @@ class BIGAN_ROOT(object):
         self.interpolate_params = interpolate_params
         self.batch_index = 0
         self.train_data = None
+        self.example = example_bool
+        self.save_img_example_folder = save_folder + 'example_images/'
 
         self.clip_dis_weight = clip_dis_weight
         self.dis_clip_value = dis_clip_value
@@ -211,6 +216,60 @@ class BIGAN_ROOT(object):
         plt.close()
 
 
+
+    def generate_examples(self,n_imgs=7):
+        
+
+        input_images = np.zeros(shape=[2*n_imgs,self.img_rows,self.img_cols,self.channels])
+        index = 0
+
+
+        while index<n_imgs:
+            sample = self.get_batch(1)
+            decoded_sample = self.encode_decode(sample)
+            self.display_pair(sample,decoded_sample)
+            decision = raw_input("should we keep this image ?\n").lower()
+            if 'y' in decision:
+                input_images[index] = sample.squeeze()
+                index += 1
+                print('index {} added to the list'.format(index))
+                print('remaining : {}'.format(n_imgs - index))
+                plt.close()
+
+        if save_intp_input:
+            self.save_intp_input(input_images)
+
+        self.save_examples(input_images)
+
+
+    def save_examples(self,imgs):
+        
+        if not(os.path.exists(self.save_img_example_folder)):
+            os.makedirs(self.save_img_example_folder)
+
+        fig, axs = plt.subplots(2, len(imgs))
+
+
+        for i in range(len(imgs)):
+            real_image = imgs[i]
+            encoded_img = self.generator.predict(self.encoder.predict(np.array(imgs[i:i+1]))).squeeze()
+            
+            if self.channels == 1:
+                axs[0,i].imshow(real_image.squeeze(), cmap=self.cmap)
+                axs[1,i].imshow(encoded_img, cmap=self.cmap)
+            else:
+                axs[0,i].imshow(real_image.squeeze())
+                axs[1,i].imshow(encoded_img)
+
+
+            axs[0,i].axis('off')
+            axs[1,i].axis('off')
+
+        fig.savefig(self.save_img_example_folder + "example.png")
+        plt.close()
+
+
+
     def reload_intp_images(self):
         if os.path.exists(self.save_intp_input_folder + 'intp_images.npy'):
             idx = np.load(self.save_intp_input_folder + 'intp_images.npy').tolist()
@@ -328,7 +387,7 @@ class BIGAN_ROOT(object):
         self.save_imgs('test',imgs)
         print('done...')
 
-    def run(self,epochs=30001, batch_size=32, save_interval=100,start_iteration=0):
+    def run(self,epochs=30001, batch_size=32, save_interval=100,start_iteration=0,n_imgs=7):
         
         if  self.train_bool:
             print('training ...')
@@ -345,6 +404,11 @@ class BIGAN_ROOT(object):
             print('interpolating ...')
             self.run_interpolation(**self.interpolate_params)
             print('interpolation done !')
+
+        if self.example : 
+            print('getting examples')
+            self.generate_examples(n_imgs=n_imgs)
+            print('generation done')
 
     def montage(self, image):
         montage=[]
@@ -436,13 +500,13 @@ class BIGAN_ROOT(object):
 
 
     def plot(self, fig, img):
-        raise NotImplementedError
-        # if self.channels == 1:
-        #     fig.imshow(img,cmap=self.cmap)
-        #     fig.axis('off')
-        # else:
-        #     fig.imshow(img)
-        #     fig.axis('off')
+        # raise NotImplementedError
+        if self.channels == 1:
+            fig.imshow(img,cmap=self.cmap)
+            fig.axis('off')
+        else:
+            fig.imshow(img)
+            fig.axis('off')
 
 
 

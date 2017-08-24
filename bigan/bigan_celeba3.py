@@ -34,6 +34,8 @@ if 'alison' in  platform.node().lower():
 elif 'desktop' in  platform.node().lower():
     is_sofiane = True
     celeba_path = 'D:\Code\data\sceleba.npy'
+elif 'sofiane' in platform.node().lower():
+    celeba_path = '/Users/sofianemahiou/Code/data/sceleba.npy'
 else:
     celeba_path = '/data/users/amp115/skin_analytics/inData/celeba.npy'
 
@@ -41,8 +43,8 @@ from bigan_root import BIGAN_ROOT
 
 
 class BIGAN(BIGAN_ROOT):
-    def __init__(self,test_model = False,interpolate_bool=False,celeba_path=celeba_path,preload=False,start_iteration=0,train_bool=True):
-        super(BIGAN, self).__init__(train_bool=train_bool, test_model=test_model,interpolate_bool=interpolate_bool,
+    def __init__(self,example_bool = False, test_model = False,interpolate_bool=False,celeba_path=celeba_path,preload=False,start_iteration=0,train_bool=True):
+        super(BIGAN, self).__init__(example_bool = example_bool, train_bool=train_bool, test_model=test_model,interpolate_bool=interpolate_bool,
                                     img_rows=64,img_cols=64,channels=3, save_folder='bigan/celeba3/'
                                     ,latent_dim=200,preload=preload)
         
@@ -192,20 +194,26 @@ if __name__ == '__main__':
     interpolate_bool = False
     preload=False
     start_iteration = 0
+    example_bool = False
     if '-preload' in sys.argv[1:]:
         preload = True
     if '-test' in sys.argv[1:]:
         test_bool = True
         train_bool = False
     if '-interpolate' in sys.argv[1:]:
-        interpolate_bool = True$
+        interpolate_bool = True
         train_bool = False
     if '-start' in sys.argv[1:]:
         start_iteration = int(sys.argv[sys.argv.index('-start')+1])
         if start_iteration != 0:
             preload = True
+    if '-example' in sys.argv[1:]:
+        train_bool = False
+        preload = True
+        example_bool = True
 
-    bigan = BIGAN(train_bool= train_bool, test_model = test_bool,interpolate_bool = interpolate_bool,preload=preload)
+
+    bigan = BIGAN(example_bool = example_bool, train_bool= train_bool, test_model = test_bool,interpolate_bool = interpolate_bool,preload=preload)
     bigan.run(epochs=50001, batch_size=64, save_interval=100,start_iteration=start_iteration)
 
 
