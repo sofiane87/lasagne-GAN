@@ -267,30 +267,29 @@ class BIGAN_ROOT(object):
             # ---------------------
             #  Train Discriminator
             # ---------------------
-            for k in range(1):
-                # Sample noise and generate img
-                z = np.random.normal(size=(half_batch, self.latent_dim)).astype('float32')
-                imgs_ = self.generator.predict(z)
+            # Sample noise and generate img
+            z = np.random.normal(size=(half_batch, self.latent_dim)).astype('float32')
+            imgs_ = self.generator.predict(z)
 
-                # Select a random half batch of images and encode
-                # idx = np.random.randint(0, X_train.shape[0], half_batch)
-                # imgs = X_train[idx]
-                imgs = self.get_batch(batch_size = half_batch)
-                z_ = self.encoder.predict(imgs)
+            # Select a random half batch of images and encode
+            # idx = np.random.randint(0, X_train.shape[0], half_batch)
+            # imgs = X_train[idx]
+            imgs = self.get_batch(batch_size = half_batch)
+            z_ = self.encoder.predict(imgs)
 
-                valid = np.ones((half_batch, 1)).astype('float32')
-                fake = np.zeros((half_batch, 1)).astype('float32')
+            valid = np.ones((half_batch, 1)).astype('float32')
+            fake = np.zeros((half_batch, 1)).astype('float32')
 
-                # Train the discriminator (img -> z is valid, z -> img is fake)
-                d_loss_real = self.discriminator.train_on_batch([z_, imgs], valid)
-                d_loss_fake = self.discriminator.train_on_batch([z, imgs_], fake)
-                d_loss = 0.5 * np.add(d_loss_real, d_loss_fake)
+            # Train the discriminator (img -> z is valid, z -> img is fake)
+            d_loss_real = self.discriminator.train_on_batch([z_, imgs], valid)
+            d_loss_fake = self.discriminator.train_on_batch([z, imgs_], fake)
+            d_loss = 0.5 * np.add(d_loss_real, d_loss_fake)
 
-                # if self.clip_dis_weight :
-                #     for l in self.discriminator.layers:
-                #         weights = l.get_weights()
-                #         weights = [np.clip(w, -self.dis_clip_value, self.dis_clip_value) for w in weights]
-                #         l.set_weights(weights)
+            # if self.clip_dis_weight :
+            #     for l in self.discriminator.layers:
+            #         weights = l.get_weights()
+            #         weights = [np.clip(w, -self.dis_clip_value, self.dis_clip_value) for w in weights]
+            #         l.set_weights(weights)
 
 
 
@@ -349,8 +348,8 @@ class BIGAN_ROOT(object):
 
     def montage(self, image):
         montage=[]
-        rows = 5
-        cols = 5
+        rows = 10
+        cols = 10
         for i in range(rows):
             col = image[i*cols:(i+1)*cols]
             col = np.hstack(col)
@@ -362,8 +361,7 @@ class BIGAN_ROOT(object):
         if not(os.path.exists(self.save_img_folder)):
             os.makedirs(self.save_img_folder)
 
-        r, c = 5, 5
-        z = np.random.normal(size=(25, self.latent_dim))
+        z = np.random.normal(size=(100, self.latent_dim))
         gen_imgs = self.generator.predict(z)
         gen_imgs = 0.5 * gen_imgs + 0.5
 
@@ -374,17 +372,25 @@ class BIGAN_ROOT(object):
         imgs = imgs * 0.5 + 0.5
 
 
-        real_montage = self.montage(1-imgs)
+        real_montage = self.montage(imgs)
         imsave(self.save_img_folder + '{}_0real.png'.format(epoch),real_montage)
         print('-- Saving real --')
 
-        gen_montage = self.montage(1-gen_imgs)
+        gen_montage = self.montage(gen_imgs)
         imsave(self.save_img_folder + '{}_2gen.png'.format(epoch),gen_montage)
         print('-- Saving generated --')
 
-        enc_montage = self.montage(1-gen_enc_imgs)
+        enc_montage = self.montage(gen_enc_imgs)
         imsave(self.save_img_folder + '{}_1enc.png'.format(epoch),enc_montage)
         print('-- Saving encoded --')
+
+        self.train_data = self.load_data()
+        trueImgs = self.train_data[0:99]
+        img_enc = encode_decode(trueImgs)
+
+        enc_dec_montage = self.montage(img_enc)
+        imsave(self.save_img_folder + '{}_3encDec.png'.format(epoch),enc_dec_montage)
+        print('-- Saving enc/dec --')
 
         # fig, axs = plt.subplots(r, c)
         # cnt = 0
@@ -427,6 +433,7 @@ class BIGAN_ROOT(object):
         # else : 
         #     fig.savefig(self.save_img_folder + "%d_real.png" % epoch)
         # plt.close()
+    def showTraining(self,):
 
 
     def plot(self, fig, img):
