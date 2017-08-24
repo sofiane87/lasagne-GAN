@@ -13,6 +13,7 @@ from keras import losses
 from keras.utils import to_categorical
 import keras.backend as K
 from keras.models import load_model
+import os
 
 
 import numpy as np
@@ -314,9 +315,10 @@ class BIGAN():
 
     def load_data(self):
         print('---- loading MNIST -----')
-        X_train = np.load('/data/users/amp115/skin_analytics/inData/mnist.npy')
+        #X_train = np.load('/data/users/amp115/skin_analytics/inData/mnist.npy')
+        X_train = np.load('/Users/pouplinalison/Documents/skin_analytics/code_dcgan/inData/shuffle.npy')
         print('----- MNIST loaded ------')
-        print (x_train.shape, X_train.min(), X_train.max())
+        print (X_train.shape, X_train.min(), X_train.max())
         return X_train
 
     def model_save(self):
@@ -337,8 +339,8 @@ class BIGAN():
         X_train = self.load_data()
 
         # Rescale -1 to 1
+        X_train = X_train.transpose(0,2,3,1)
         X_train = (X_train.astype(np.float32) - 127.5) / 127.5
-        X_train = np.expand_dims(X_train, axis=3)
 
         half_batch = int(batch_size / 2)
 
