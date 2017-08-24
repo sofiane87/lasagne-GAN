@@ -140,13 +140,13 @@ class BIGAN(BIGAN_ROOT):
 
 
 if __name__ == '__main__':
-    reload_bool = False
+
     interpolate_bool = False
     if '-test' in sys.argv[1:]:
         reload_bool = True
     if '-interpolate' in sys.argv[1:]:
         interpolate_bool = True
-    bigan = BIGAN(reload_model = reload_bool,interpolate_bool = interpolate_bool)
+    bigan = BIGAN(interpolate_bool = interpolate_bool)
     bigan.run(epochs=50001, batch_size=128, save_interval=100)
 
 
