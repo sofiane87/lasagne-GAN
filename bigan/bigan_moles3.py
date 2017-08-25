@@ -11,11 +11,11 @@ from keras.optimizers import Adam,RMSprop, SGD
 from keras import losses
 from keras.utils import to_categorical
 import keras.backend as K
-
+import os
 import numpy as np
 from time import time
 import sys
-
+from matplotlib import pyplot as plt
 
 backend_name = K.backend()
 
@@ -30,23 +30,25 @@ print('platform : ', platform.node().lower())
 is_sofiane = False
 
 if 'alison' in  platform.node().lower():
-    celeba_path = '/Users/pouplinalison/Documents/skin_analytics/code_dcgan/inData/all_moles_64.npy'
+    moles_path = '/Users/pouplinalison/Documents/skin_analytics/code_dcgan/inData/all_moles_64.npy'
 elif 'desktop' in  platform.node().lower():
     is_sofiane = True
-    celeba_path = 'D:\Code\data\moles.npy'
+    moles_path = 'D:\Code\data\moles.npy'
+elif 'sofiane' in platform.node().lower():
+    moles_path = '/Users/sofianemahiou/Code/data/all_moles_64.npy'
 else:
-    celeba_path = '/data/users/amp115/skin_analytics/inData/all_moles_64.npy'
+    moles_path = '/data/users/amp115/skin_analytics/inData/all_moles_64.npy'
 
 from bigan_root import BIGAN_ROOT
 
 
 class BIGAN(BIGAN_ROOT):
-    def __init__(self,test_model = False,interpolate_bool=False,celeba_path=celeba_path,preload=False,start_iteration=0,train_bool=True):
-        super(BIGAN, self).__init__(train_bool=train_bool, test_model=test_model,interpolate_bool=interpolate_bool,
+    def __init__(self,example_bool = False,test_model = False,interpolate_bool=False,moles_path=moles_path,preload=False,start_iteration=0,train_bool=True):
+        super(BIGAN, self).__init__(example_bool = example_bool,train_bool=train_bool, test_model=test_model,interpolate_bool=interpolate_bool,
                                     img_rows=64,img_cols=64,channels=3, save_folder='bigan/moles/'
                                     ,latent_dim=200,preload=preload)
         
-        self.dataPath = celeba_path
+        self.dataPath = moles_path
 
    
 
@@ -193,6 +195,31 @@ class BIGAN(BIGAN_ROOT):
             fig.imshow(np.floor(np.array(img*255)))
             fig.axis('off')
 
+    def save_examples(self,imgs):
+        
+        if not(os.path.exists(self.save_img_example_folder)):
+            os.makedirs(self.save_img_example_folder)
+
+        fig, axs = plt.subplots(2, len(imgs))
+
+
+        for i in range(len(imgs)):
+            real_image = imgs[i]
+            encoded_img = self.generator.predict(self.encoder.predict(np.array(imgs[i:i+1]))).squeeze()
+            
+            real_image = 0.5 + 0.5 * real_image
+            encoded_img = 0.5 + 0.5 * encoded_img
+            axs[0,i].imshow(np.floor(np.array(real_image.squeeze()*255)))
+            axs[1,i].imshow(np.floor(np.array(encoded_img.squeeze()*255)))
+
+
+            axs[0,i].axis('off')
+            axs[1,i].axis('off')
+
+        fig.savefig(self.save_img_example_folder + "example.png")
+        plt.close()
+
+
 if __name__ == '__main__':
     test_bool = False
     train_bool = True
@@ -211,8 +238,13 @@ if __name__ == '__main__':
         start_iteration = int(sys.argv[sys.argv.index('-start')+1])
         if start_iteration != 0:
             preload = True
+    if '-example' in sys.argv[1:]:
+        train_bool = False
+        preload = True
+        example_bool = True
 
-    bigan = BIGAN(train_bool= train_bool, test_model = test_bool,interpolate_bool = interpolate_bool,preload=preload)
+
+    bigan = BIGAN(example_bool = example_bool, train_bool= train_bool, test_model = test_bool,interpolate_bool = interpolate_bool,preload=preload)
     bigan.run(epochs=50001, batch_size=64, save_interval=100,start_iteration=start_iteration)
 
 

@@ -220,7 +220,7 @@ class BIGAN_ROOT(object):
     def generate_examples(self,n_imgs=7):
         
 
-        input_images = np.zeros(shape=[2*n_imgs,self.img_rows,self.img_cols,self.channels])
+        input_images = np.zeros(shape=[n_imgs,self.img_rows,self.img_cols,self.channels])
         index = 0
 
 
@@ -230,14 +230,11 @@ class BIGAN_ROOT(object):
             self.display_pair(sample,decoded_sample)
             decision = raw_input("should we keep this image ?\n").lower()
             if 'y' in decision:
-                input_images[index] = sample.squeeze()
+                input_images[index] = sample[0]
                 index += 1
                 print('index {} added to the list'.format(index))
                 print('remaining : {}'.format(n_imgs - index))
                 plt.close()
-
-        if save_intp_input:
-            self.save_intp_input(input_images)
 
         self.save_examples(input_images)
 
@@ -254,6 +251,8 @@ class BIGAN_ROOT(object):
             real_image = imgs[i]
             encoded_img = self.generator.predict(self.encoder.predict(np.array(imgs[i:i+1]))).squeeze()
             
+            real_image = 0.5 + 0.5 * real_image
+            encoded_img = 0.5 + 0.5 * encoded_img
             if self.channels == 1:
                 axs[0,i].imshow(real_image.squeeze(), cmap=self.cmap)
                 axs[1,i].imshow(encoded_img, cmap=self.cmap)

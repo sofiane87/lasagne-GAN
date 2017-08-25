@@ -248,22 +248,13 @@ class BIGAN(BIGAN_ROOT):
         return Model([z, img], validity)
 
 
-
     def load_data(self):
-        print('----- Loading CelebA -------')
-        X_train = np.load(self.dataPath)
-        print('------ Data Loaded : Preprocessing -----')
-        X_train = X_train.transpose([0,2,3,1])
-        # Rescale -1 to 1
-        if is_sofiane:
-            for i in range(X_train.shape[0]):
-                print('advancement: {:.2f}%'.format(i/X_train.shape[0]*100),end='\r')
-                X_train[i] = (X_train[i].astype(np.float32) - 0.5) / 0.5
-        else:
-            X_train = (X_train.astype(np.float32) - 0.5) / 0.5
-        print('CelebA shape:', X_train.shape, X_train.min(), X_train.max())
-        print('------- CelebA loaded -------')
-        
+        print('---- loading MNIST -----')
+        #X_train = np.load('/data/users/amp115/skin_analytics/inData/mnist.npy')
+        X_train = np.load(self.dataPath).transpose([0,2,3,1])
+        X_train = ((X_train - 127.5)/127.5).astype('float32')
+        print('----- MNIST loaded ------')
+        print (X_train.shape, X_train.min(), X_train.max())
         return X_train
 
 
